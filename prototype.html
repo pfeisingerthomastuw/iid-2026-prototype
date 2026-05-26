@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+  <title>CHEN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    /* ─────────────────────────────────────────
+       TOKENS — edit these to restyle globally
+    ───────────────────────────────────────── */
+    :root {
+      --red:         #D32F2F;
+      --red-light:   #FFEBEE;
+      --teal:        #00838F;
+      --teal-dark:   #006978;
+      --blue-card:   #D6EAF8;
+      --blue-border: #AED6F1;
+      --blue-text:   #1A6FA0;
+      --bg:          #F0F0F0;
+      --card:        #FFFFFF;
+      --text:        #111111;
+      --text-sub:    #555555;
+      --text-muted:  #888888;
+      --border:      #E0E0E0;
+      --border-mid:  #CCCCCC;
+      --green:       #43A047;
+      --nav-h:       68px;
+      --top-h:       50px;
+      --radius-card: 16px;
+      --radius-btn:  12px;
+    }
+
+    /* ─── Reset ─── */
+    *, *::before, *::after {
+      box-sizing: border-box; margin: 0; padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      background: #D8D8D8;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Barlow', sans-serif;
+    }
+
+    /* ─── Phone shell ─── */
+    #app {
+      width: 390px; height: 844px;
+      background: var(--bg);
+      position: relative; overflow: hidden;
+      border-radius: 44px;
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.18),
+        0 40px 100px rgba(0,0,0,0.45),
+        0 8px 30px rgba(0,0,0,0.2);
+    }
+
+    /* ─── Screen transitions ─── */
+    .screen {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      opacity: 0; pointer-events: none;
+      transform: translateX(24px);
+      transition: opacity .28s ease, transform .28s ease;
+    }
+    .screen.active       { opacity: 1; pointer-events: all; transform: none; }
+    .screen.exiting-fwd  { opacity: 0; transform: translateX(-24px); pointer-events: none; }
+    .screen.exiting-back { opacity: 0; transform: translateX(24px);  pointer-events: none; }
+
+    /* ─── Top bar ─── */
+    .topbar {
+      height: var(--top-h); flex-shrink: 0;
+      background: var(--card);
+      display: flex; align-items: center; padding: 0 18px;
+      border-bottom: 1px solid var(--border); z-index: 10;
+    }
+    .topbar-logo   { font-weight: 900; font-size: 23px; color: var(--red); letter-spacing: 3px; flex: 1; }
+    .topbar-gps    {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 10.5px; font-weight: 600; color: var(--text-muted);
+      letter-spacing: .6px; margin-right: 12px;
+    }
+    .gps-dot {
+      width: 7px; height: 7px; background: var(--green); border-radius: 50%;
+      animation: pulse-gps 2.4s ease-in-out infinite;
+    }
+    @keyframes pulse-gps {
+      0%,100% { box-shadow: 0 0 0 0   rgba(67,160,71,.5); }
+      50%      { box-shadow: 0 0 0 4px rgba(67,160,71,0);  }
+    }
+    .topbar-avatar {
+      width: 30px; height: 30px; background: #F0F0F0;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ─── Bottom nav ─── */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: var(--nav-h); background: var(--card);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-around;
+      padding: 0 12px 6px; z-index: 10;
+    }
+    .nav-item  { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; }
+    .nav-label { font-size: 10px; font-weight: 600; letter-spacing: .4px; color: #AAAAAA; }
+    .alarm-pill {
+      width: 50px; height: 50px; background: var(--red); border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+      box-shadow: 0 4px 14px rgba(211,47,47,.38);
+      transition: transform .12s;
+    }
+    .alarm-pill:active { transform: scale(.92); }
+    .alarm-pill .nav-label { color: #fff; font-size: 9px; }
+
+    /* ─── Scroll containers ─── */
+    .scroll-area, .inner-scroll {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: 14px 14px calc(var(--nav-h) + 14px);
+      scrollbar-width: none;
+    }
+    .scroll-area::-webkit-scrollbar,
+    .inner-scroll::-webkit-scrollbar { display: none; }
+    .inner-scroll { padding-top: 18px; }
+
+    /* ─── Generic card ─── */
+    .card {
+      background: var(--card); border-radius: var(--radius-card);
+      padding: 16px; margin-bottom: 11px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04);
+    }
+
+    /* ─── Home: Heatstress card ─── */
+    .heat-card {
+      display: flex; align-items: center; justify-content: space-between;
+      border: 2px solid var(--red); padding: 18px 16px;
+    }
+    .heat-label { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.1; }
+    .ring-wrap  { position: relative; width: 70px; height: 70px; flex-shrink: 0; }
+    .ring-wrap svg { transform: rotate(-90deg); }
+    .ring-bg    { fill: none; stroke: #EEE; stroke-width: 5.5; }
+    .ring-fill  {
+      fill: none; stroke: var(--red); stroke-width: 5.5; stroke-linecap: round;
+      stroke-dasharray: 175.9;
+      transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    .ring-pct {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px; font-weight: 800; color: var(--red);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ─── Home: Emergency hold card ─── */
+    .emergency-card {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 30px 20px; cursor: pointer; user-select: none;
+      position: relative; overflow: hidden; min-height: 165px;
+      transition: background .15s;
+    }
+    .emergency-card:active { background: #FAFAFA; }
+    .emerg-icon-box {
+      width: 54px; height: 54px; background: var(--red); border-radius: 13px;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 13px;
+    }
+    .emerg-title    { font-size: 21px; font-weight: 900; letter-spacing: 1.5px; color: var(--text); text-align: center; line-height: 1.15; }
+    .emerg-subtitle { font-size: 10.5px; font-weight: 600; letter-spacing: 2.5px; color: var(--text-muted); margin-top: 5px; }
+    .hold-ring-svg {
+      position: absolute; width: 110px; height: 110px;
+      top: 50%; left: 50%; transform: translate(-50%,-50%);
+      pointer-events: none; opacity: 0; transition: opacity .2s;
+    }
+    .hold-track { fill: none; stroke: #FFCDD2; stroke-width: 4; }
+    .hold-fill  {
+      fill: none; stroke: var(--red); stroke-width: 4; stroke-linecap: round;
+      stroke-dasharray: 283; stroke-dashoffset: 283;
+    }
+    @keyframes hold-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(.965)} }
+    .emergency-card.holding { animation: hold-pulse .5s ease infinite; }
+
+    /* ─── Home: Health card ─── */
+    .health-card { background: var(--blue-card); border: 1px solid var(--blue-border); padding: 14px 16px 12px; }
+    .health-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+    .health-header-label { font-size: 11.5px; font-weight: 700; color: var(--blue-text); letter-spacing: .5px; }
+    .health-chart { width: 100%; height: 58px; overflow: hidden; }
+    .health-chart svg { width: 100%; height: 100%; }
+    .ekg-line {
+      fill: none; stroke: var(--blue-text); stroke-width: 2;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .ekg-scroll {
+      display: block;
+      animation: ekg-move 8s linear infinite;
+    }
+    @keyframes ekg-move {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .health-status { text-align: right; font-size: 17px; font-weight: 700; color: var(--blue-text); margin-top: 4px; }
+
+    /* ─── Screens 2/3: emergency page header ─── */
+    .emerg-page-header { padding: 16px 14px 0; flex-shrink: 0; }
+    .emerg-tag      { font-size: 10.5px; font-weight: 700; letter-spacing: 2.5px; color: var(--red); margin-bottom: 5px; }
+    .emerg-tag.teal { color: var(--teal); }
+    .emerg-bar      { height: 3px; background: var(--red); border-radius: 2px; }
+    .emerg-bar.teal { background: var(--teal); }
+    .page-heading   { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1.12; margin-bottom: 22px; }
+
+    /* ─── Screen 2: who-is-affected cards ─── */
+    .select-card {
+      background: var(--card); border: 1.5px solid var(--border-mid); border-radius: 14px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 11px; padding: 24px 16px; margin-bottom: 12px; cursor: pointer; min-height: 105px;
+      transition: background .12s;
+    }
+    .select-card:active { background: #F9F9F9; }
+    .select-icon-bg {
+      width: 52px; height: 52px; background: #EEEEEE;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .select-icon-bg.red { background: var(--red-light); }
+    .select-label { font-size: 18px; font-weight: 900; letter-spacing: 2.5px; color: var(--text); }
+
+    /* ─── Screen 3: confirmation ─── */
+    .confirm-icon {
+      width: 84px; height: 84px; background: var(--teal); border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 14px auto 18px;
+      animation: pop-in .4s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes pop-in { from{transform:scale(.5);opacity:0} to{transform:scale(1);opacity:1} }
+    .confirm-text { text-align: center; font-size: 13px; line-height: 1.65; color: var(--text-sub); margin-bottom: 20px; }
+
+    /* ─── Screen 3: extra info box ─── */
+    .extra-box       { border: 2px dashed #CACACA; border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+    .extra-box-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .extra-box-sub   { font-size: 11px; color: var(--text-muted); margin-bottom: 13px; }
+    .symptoms-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 6px; }
+    .symptom-row     { display: flex; align-items: flex-start; gap: 6px; cursor: pointer; }
+    .sym-check {
+      width: 17px; height: 17px; border: 1.5px solid #BDBDBD; border-radius: 4px;
+      flex-shrink: 0; margin-top: 1px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .symptom-row.checked .sym-check { background: var(--teal); border-color: var(--teal); }
+    .sym-label { font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.35; flex: 1; }
+    .sym-icon  { font-size: 15px; flex-shrink: 0; }
+
+    /* ─── Shared buttons ─── */
+    .btn-outline {
+      width: 100%; padding: 14px; background: transparent;
+      border: 1.5px solid var(--border-mid); border-radius: var(--radius-btn);
+      font-family: 'Barlow', sans-serif; font-size: 15px; font-weight: 600; color: var(--text);
+      cursor: pointer; margin-top: 6px; transition: background .12s; letter-spacing: .3px;
+    }
+    .btn-outline:active { background: #F5F5F5; }
+    .btn-teal {
+      width: 100%; padding: 15px; background: var(--teal); border: none;
+      border-radius: var(--radius-btn);
+      font-family: 'Barlow', sans-serif; font-size: 16px; font-weight: 700; color: #fff;
+      cursor: pointer; margin-bottom: 10px; letter-spacing: .5px; transition: background .12s;
+    }
+    .btn-teal:active { background: var(--teal-dark); }
+    .cancel-footer {
+      flex-shrink: 0;
+      padding: 10px 14px calc(var(--nav-h) + 10px);
+      background: var(--bg);
+    }
+
+    /* ─── Health info button ─── */
+    .health-info-btn {
+      background: none; border: none; padding: 2px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; transition: background .15s;
+    }
+    .health-info-btn:active { background: rgba(0,0,0,0.06); }
+
+    /* ─── Health detail bottom sheet ─── */
+    .health-backdrop {
+      position: absolute; inset: 0; z-index: 50;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(7px) brightness(0.85);
+      -webkit-backdrop-filter: blur(7px) brightness(0.85);
+      display: flex; flex-direction: column; justify-content: flex-end;
+      animation: fade-in .2s ease;
+    }
+    .health-sheet {
+      background: var(--bg);
+      border-radius: 22px 22px 0 0;
+      padding-bottom: calc(var(--nav-h) + 6px);
+      will-change: transform;
+    }
+    .sheet-handle {
+      width: 44px; height: 5px; background: #222;
+      border-radius: 3px; margin: 14px auto 20px;
+      cursor: grab; flex-shrink: 0;
+    }
+    .metric-card {
+      background: var(--card); border-radius: 14px;
+      padding: 13px 16px; margin: 0 14px 10px;
+      border: 1.5px solid var(--border);
+    }
+    .metric-card.red  { border-color: var(--red); }
+    .metric-card.teal { border-color: var(--teal); }
+    .metric-header { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+    .metric-label  { font-size: 13px; font-weight: 700; color: var(--text); }
+    .metric-value-row { display: flex; align-items: center; justify-content: space-between; }
+    .metric-value  { font-size: 30px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; }
+    .metric-ekg    { width: 72px; height: 28px; flex-shrink: 0; }
+    .metric-ekg path { fill: none; stroke: var(--text-muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .metric-guide  { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+
+    /* ─── Urgent screen theme (affected.js) ─── */
+    .screen--urgent {
+      background: linear-gradient(160deg, #C62828 0%, #6B0000 100%);
+      animation: urgent-breathe 3s ease-in-out infinite;
+    }
+    @keyframes urgent-breathe {
+      0%,100% { filter: brightness(1);   }
+      50%      { filter: brightness(1.08); }
+    }
+    .screen--urgent .topbar {
+      background: rgba(0,0,0,0.22);
+      border-bottom-color: rgba(255,255,255,0.12);
+    }
+    .screen--urgent .topbar-logo  { color: #fff; }
+    .screen--urgent .topbar-gps  { color: rgba(255,255,255,0.75); }
+    .screen--urgent .topbar-avatar {
+      background: rgba(255,255,255,0.15);
+    }
+    .screen--urgent .topbar-avatar svg { filter: brightness(0) invert(1); }
+    .screen--urgent .emerg-page-header { padding-top: 20px; }
+    .screen--urgent .emerg-tag  { color: rgba(255,255,255,0.75); font-size: 11px; }
+    .screen--urgent .emerg-bar  { background: rgba(255,255,255,0.45); }
+    .screen--urgent .page-heading {
+      color: #fff;
+      font-size: 36px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.25);
+    }
+    .screen--urgent .inner-scroll { background: transparent; }
+    .screen--urgent .select-card {
+      border-color: transparent;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.28);
+    }
+    .screen--urgent .select-card:active { background: #f5f5f5; }
+    .screen--urgent .cancel-footer  { background: transparent; }
+    .screen--urgent .btn-outline {
+      border-color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.9);
+    }
+    .screen--urgent .btn-outline:active { background: rgba(255,255,255,0.1); }
+    .screen--urgent .cancel-note { color: rgba(255,255,255,0.45); }
+    .screen--urgent .bottom-nav {
+      background: rgba(0,0,0,0.22);
+      border-top-color: rgba(255,255,255,0.1);
+    }
+    .screen--urgent .nav-label    { color: rgba(255,255,255,0.5); }
+    .screen--urgent .alarm-pill   {
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .screen--urgent .alarm-pill svg    { filter: brightness(0) saturate(100%) invert(17%) sepia(85%) saturate(2000%) hue-rotate(350deg); }
+    .screen--urgent .alarm-pill .nav-label { color: var(--red); }
+
+    /* ─── Cancel confirmation dialog ─── */
+    .dialog-backdrop {
+      position: absolute; inset: 0; z-index: 100;
+      background: rgba(0,0,0,0.45);
+      display: flex; align-items: flex-end;
+      animation: fade-in .18s ease;
+    }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    .dialog {
+      width: 100%; background: var(--card);
+      border-radius: 22px 22px 0 0;
+      padding: 24px 18px calc(var(--nav-h) + 18px);
+      animation: slide-up .22s cubic-bezier(.32,1,.6,1);
+    }
+    @keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .dialog-title { font-size: 19px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    .dialog-body  { font-size: 13px; color: var(--text-sub); line-height: 1.55; margin-bottom: 22px; }
+    .btn-red {
+      width: 100%; padding: 15px; background: var(--red); border: none;
+      border-radius: var(--radius-btn);
+      font-family: 'Barlow', sans-serif; font-size: 16px; font-weight: 700; color: #fff;
+      cursor: pointer; margin-bottom: 10px; transition: background .12s;
+    }
+    .btn-red:active { background: #B71C1C; }
+    .cancel-note { font-size: 11px; color: var(--text-muted); font-style: italic; text-align: center; margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+
+<!-- Load order matters: data & icons first, then shared components, then screens -->
+<script src="js/data.js"></script>
+<script src="js/icons.js"></script>
+<script src="js/components.js"></script>
+<script src="screens/home.js"></script>
+<script src="screens/affected.js"></script>
+<script src="screens/reported.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   ROUTER — builds screens and manages transitions
+   To add a screen: create screens/yourscreen.js, call
+   registerScreen('yourscreen', () => { ... }), then goTo() it.
+═══════════════════════════════════════════════════════════════ */
+let currentId = null;
+const screenEls = {};
+const app = document.getElementById('app');
+
+// Instantiate and mount all registered screens
+Object.keys(SCREENS).forEach(id => {
+  const node = SCREENS[id]();
+  node.id = `screen-${id}`;
+  screenEls[id] = node;
+  app.appendChild(node);
+});
+
+// skipHistory = true when called from popstate (avoid double-pushing)
+function goTo(targetId, direction = 'forward', skipHistory = false) {
+  if (targetId === currentId) return;
+  const next = screenEls[targetId];
+  const prev = currentId ? screenEls[currentId] : null;
+
+  if (prev) {
+    prev.classList.add(direction === 'back' ? 'exiting-back' : 'exiting-fwd');
+    prev.classList.remove('active');
+    setTimeout(() => prev.classList.remove('exiting-fwd', 'exiting-back'), 300);
+  }
+
+  next.style.transform = direction === 'back' ? 'translateX(-24px)' : 'translateX(24px)';
+  next.classList.add('active');
+  requestAnimationFrame(() => { next.style.transform = ''; });
+
+  if (next._onActivate) next._onActivate();
+  currentId = targetId;
+
+  if (!skipHistory) {
+    history.pushState({ screenId: targetId }, '');
+  }
+}
+
+// Browser back/forward buttons
+window.addEventListener('popstate', e => {
+  const id = e.state?.screenId ?? 'home';
+  goTo(id, id === 'home' ? 'back' : 'forward', true);
+});
+
+// Seed initial history entry so back button works from first screen
+history.replaceState({ screenId: 'home' }, '');
+goTo('home', 'forward', true);
+</script>
+</body>
+</html>
