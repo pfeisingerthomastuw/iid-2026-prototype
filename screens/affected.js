@@ -19,7 +19,7 @@ registerScreen('affected', () => {
     card.innerHTML = `
       <div class="select-icon-bg ${opt.iconBg}">${opt.icon}</div>
       <div class="select-label">${opt.label}</div>`;
-    card.addEventListener('click', () => goTo(opt.target));
+    card.addEventListener('click', () => showLoading(1500, () => goTo(opt.target)));
     scroll.appendChild(card);
   });
 

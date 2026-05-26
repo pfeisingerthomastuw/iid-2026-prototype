@@ -58,6 +58,52 @@ const ICON = {
     <polyline points="20 6 9 17 4 12"/>
   </svg>`,
 
+  sun: () => `<svg width="52" height="52" viewBox="0 0 24 24" fill="none"
+    stroke="#F59E0B" stroke-width="2" stroke-linecap="round">
+    <circle cx="12" cy="12" r="4" fill="#FCD34D" stroke="#F59E0B"/>
+    <line x1="12" y1="2"    x2="12" y2="4.5"/>
+    <line x1="12" y1="19.5" x2="12" y2="22"/>
+    <line x1="2"  y1="12"   x2="4.5" y2="12"/>
+    <line x1="19.5" y1="12" x2="22" y2="12"/>
+    <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"/>
+    <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"/>
+    <line x1="19.07" y1="4.93" x2="17.3" y2="6.7"/>
+    <line x1="6.7" y1="17.3" x2="4.93" y2="19.07"/>
+  </svg>`,
+
+  drop: (c) => `<svg width="13" height="13" viewBox="0 0 24 24"
+    fill="${c}" stroke="${c}" stroke-width="1.5" stroke-linecap="round">
+    <path d="M12 2C6 10 4 14 4 16a8 8 0 0 0 16 0c0-2-2-6-8-14z"/>
+  </svg>`,
+
+  wind: (c) => `<svg width="13" height="13" viewBox="0 0 24 24"
+    fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round">
+    <path d="M9.59 4.59A2 2 0 1 1 11 8H2"/>
+    <path d="M12.59 19.41A2 2 0 1 0 14 16H2"/>
+    <path d="M6 12h8a2 2 0 1 1-2 2"/>
+  </svg>`,
+
+  uvRay: (c) => `<svg width="13" height="13" viewBox="0 0 24 24"
+    fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round">
+    <circle cx="12" cy="12" r="4"/>
+    <line x1="12" y1="2"  x2="12" y2="5"/>
+    <line x1="12" y1="19" x2="12" y2="22"/>
+    <line x1="2"  y1="12" x2="5"  y2="12"/>
+    <line x1="19" y1="12" x2="22" y2="12"/>
+    <line x1="4.93" y1="4.93" x2="6.7" y2="6.7"/>
+    <line x1="17.3" y1="17.3" x2="19.07" y2="19.07"/>
+    <line x1="19.07" y1="4.93" x2="17.3" y2="6.7"/>
+    <line x1="6.7" y1="17.3" x2="4.93" y2="19.07"/>
+  </svg>`,
+
+  medkit: (c) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+    stroke="${c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="7" width="20" height="14" rx="2"/>
+    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+    <line x1="12" y1="11" x2="12" y2="17"/>
+    <line x1="9"  y1="14" x2="15" y2="14"/>
+  </svg>`,
+
   heart: (c) => `<svg width="16" height="16" viewBox="0 0 24 24" fill="${c}" stroke="${c}" stroke-width="1.5">
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
   </svg>`,

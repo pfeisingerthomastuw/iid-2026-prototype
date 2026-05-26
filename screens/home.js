@@ -23,8 +23,49 @@ registerScreen('home', () => {
     + ' L540,29 L548,29 L553,8 L558,50 L563,16 L568,29'
     + ' L600,29';
 
+  const w = DATA.weather;
+
   const scroll = el('div', 'scroll-area');
   scroll.innerHTML = `
+    <!-- Weather -->
+    <div class="card weather-card">
+      <div class="weather-top">
+        <div class="weather-icon-wrap">${ICON.sun()}</div>
+        <div class="weather-main">
+          <div class="weather-temp">${w.temp}°C</div>
+          <div class="weather-feels">Feels like ${w.feelsLike}°C</div>
+        </div>
+        <div class="weather-meta">
+          <div class="weather-location">${w.location}</div>
+          <div class="weather-condition">${w.condition}</div>
+        </div>
+      </div>
+      <div class="weather-divider"></div>
+      <div class="weather-metrics">
+        <div class="weather-metric">
+          ${ICON.drop('#3B82F6')}
+          <div class="weather-metric-inner">
+            <span class="weather-metric-val">${w.humidity}%</span>
+            <span class="weather-metric-lbl">Humidity</span>
+          </div>
+        </div>
+        <div class="weather-metric">
+          ${ICON.uvRay('#F59E0B')}
+          <div class="weather-metric-inner">
+            <span class="weather-metric-val">UV ${w.uvIndex}<span class="uv-badge">${w.uvLabel}</span></span>
+            <span class="weather-metric-lbl">UV Index</span>
+          </div>
+        </div>
+        <div class="weather-metric">
+          ${ICON.wind('#6B7280')}
+          <div class="weather-metric-inner">
+            <span class="weather-metric-val">${w.windSpeed} km/h</span>
+            <span class="weather-metric-lbl">Wind</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Heatstress Risk -->
     <div class="card heat-card">
       <div class="heat-label">Heatstress<br>Risk</div>

@@ -44,6 +44,8 @@ registerScreen('reported', () => {
 
   const shareBtn = el('button', 'btn-teal');
   shareBtn.textContent = 'Share extra Info';
+  shareBtn.addEventListener('click', () =>
+    showToast('Information shared', 'Your responder has been notified'));
 
   scroll.append(heading, confirmIcon, confirmText, extraBox, shareBtn);
 

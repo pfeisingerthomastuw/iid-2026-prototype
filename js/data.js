@@ -10,6 +10,18 @@ const DATA = {
     healthStatus:   'Stable', // label on health card
   },
 
+  weather: {
+    location:   'Vienna, AT',
+    condition:  'Clear Sky',
+    icon:       'sun',        // sun | cloud | rain | storm
+    temp:       34,           // °C
+    feelsLike:  38,           // °C
+    humidity:   45,           // %
+    uvIndex:    8,
+    uvLabel:    'Very High',
+    windSpeed:  12,           // km/h
+  },
+
   symptoms: [
     { label: 'Dizziness /\nNausea',   icon: '🩺' },
     { label: 'Muscle\nCramps',        icon: '💪' },
@@ -27,6 +39,17 @@ const DATA = {
   navTabs: [
     { id: 'alarm',    label: 'Alarm',     alarm: true  },
     { id: 'map',      label: 'Map',       alarm: false },
+    { id: 'help',     label: 'Help',      alarm: false },
     { id: 'firstaid', label: 'First Aid', alarm: false },
+  ],
+
+  // People in need shown on the help map
+  peopleInNeed: [
+    { coords: [48.2089, 16.3732], name: 'Max M.',   status: 'critical' },
+    { coords: [48.2015, 16.3590], name: 'Anna K.',  status: 'moderate' },
+    { coords: [48.1998, 16.3489], name: 'Hans B.',  status: 'critical' },
+    { coords: [48.2045, 16.3620], name: 'Lisa W.',  status: 'moderate' },
+    { coords: [48.1952, 16.3445], name: 'Peter S.', status: 'critical' },
+    { coords: [48.2060, 16.3510], name: 'Eva R.',   status: 'moderate' },
   ],
 };
