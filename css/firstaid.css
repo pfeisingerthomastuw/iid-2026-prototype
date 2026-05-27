@@ -1,0 +1,30 @@
+/* ── First Aid screen ── */
+.fa-content {
+  flex: 1; overflow-y: auto;
+  padding: 16px 16px calc(var(--nav-h) + 20px);
+  display: flex; flex-direction: column; gap: 12px;
+}
+.fa-header   { margin-bottom: 2px; }
+.fa-title    { font-size: 22px; font-weight: 800; color: #1A1A1A; margin-top: 10px; line-height: 1.2; }
+.fa-subtitle { font-size: 13px; color: #666; margin-top: 4px; line-height: 1.4; }
+
+.fa-steps    { display: flex; flex-direction: column; gap: 10px; }
+.fa-step-card {
+  background: white; border-radius: 12px;
+  border: 1px solid #E8E8E8; padding: 12px 14px;
+  display: flex; align-items: flex-start; gap: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.fa-step-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: #E0F4F5; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.fa-step-icon.urgent { background: #FFEBEE; }
+.fa-step-body  { flex: 1; }
+.fa-step-num   { font-size: 10px; font-weight: 700; letter-spacing: .06em; color: #00838F; text-transform: uppercase; margin-bottom: 2px; }
+.fa-step-title { font-size: 14px; font-weight: 700; color: #1A1A1A; margin-bottom: 4px; line-height: 1.3; }
+.fa-step-text  { font-size: 12.5px; color: #555; line-height: 1.5; }
+
+.fa-call-btn { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; }
+.fa-back-btn { margin-top: 0; }

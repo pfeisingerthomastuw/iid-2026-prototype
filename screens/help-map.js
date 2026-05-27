@@ -170,9 +170,11 @@ registerScreen('help-map', () => {
           </div>
         </div>
       </div>
+      <button class="btn-teal"    id="firstAidBtn">First Aid Instructions</button>
       <button class="btn-outline" id="cancelNavBtn">Cancel Navigation</button>
     `;
 
+    detailCard.querySelector('#firstAidBtn').addEventListener('click',  () => goTo('firstaid'));
     detailCard.querySelector('#cancelNavBtn').addEventListener('click', hideCard);
   }
 

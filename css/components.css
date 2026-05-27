@@ -1,0 +1,92 @@
+/* ── Generic card ── */
+.card {
+  background: var(--card); border-radius: var(--radius-card);
+  padding: 16px; margin-bottom: 11px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07), 0 0 0 1px rgba(0,0,0,.04);
+}
+
+/* ── Buttons ── */
+.btn-outline {
+  width: 100%; padding: 14px; background: transparent;
+  border: 1.5px solid var(--border-mid); border-radius: var(--radius-btn);
+  font-family: 'Barlow', sans-serif; font-size: 15px; font-weight: 600; color: var(--text);
+  cursor: pointer; margin-top: 6px; transition: background .12s; letter-spacing: .3px;
+}
+.btn-outline:active { background: #F5F5F5; }
+
+.btn-teal {
+  width: 100%; padding: 15px; background: var(--teal); border: none;
+  border-radius: var(--radius-btn);
+  font-family: 'Barlow', sans-serif; font-size: 16px; font-weight: 700; color: #fff;
+  cursor: pointer; margin-bottom: 10px; letter-spacing: .5px; transition: background .12s;
+}
+.btn-teal:active { background: var(--teal-dark); }
+
+.btn-red {
+  width: 100%; padding: 15px; background: var(--red); border: none;
+  border-radius: var(--radius-btn);
+  font-family: 'Barlow', sans-serif; font-size: 16px; font-weight: 700; color: #fff;
+  cursor: pointer; margin-bottom: 10px; transition: background .12s;
+}
+.btn-red:active { background: #B71C1C; }
+
+/* ── Cancel footer ── */
+.cancel-footer {
+  flex-shrink: 0;
+  padding: 10px 14px calc(var(--nav-h) + 10px);
+  background: var(--bg);
+}
+.cancel-note { font-size: 11px; color: var(--text-muted); font-style: italic; text-align: center; margin-top: 8px; }
+
+/* ── Toast notification ── */
+.toast {
+  position: absolute; left: 14px; right: 14px;
+  bottom: calc(var(--nav-h) + 12px);
+  z-index: 70;
+  background: var(--teal); color: #fff;
+  border-radius: 14px; padding: 13px 16px;
+  display: flex; align-items: center; gap: 11px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.22);
+  transform: translateY(20px); opacity: 0;
+  transition: transform .25s cubic-bezier(.32,1,.6,1), opacity .25s ease;
+  pointer-events: none;
+}
+.toast.visible { transform: translateY(0); opacity: 1; }
+.toast.hiding  { transform: translateY(20px); opacity: 0; }
+.toast-icon    { flex-shrink: 0; }
+.toast-text    { flex: 1; }
+.toast-title   { font-size: 13px; font-weight: 700; }
+.toast-sub     { font-size: 11px; opacity: .8; margin-top: 1px; }
+
+/* ── Loading overlay ── */
+.loading-overlay {
+  position: absolute; inset: 0; z-index: 60;
+  background: linear-gradient(160deg, #C62828 0%, #6B0000 100%);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 22px;
+  animation: fade-in .15s ease;
+}
+.spinner { width: 56px; height: 56px; animation: spin .85s linear infinite; transform-origin: center; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner-track { fill: none; stroke: rgba(255,255,255,0.2); stroke-width: 4.5; }
+.spinner-arc   {
+  fill: none; stroke: #fff; stroke-width: 4.5; stroke-linecap: round;
+  stroke-dasharray: 138; stroke-dashoffset: 104;
+}
+.loading-label { color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 600; letter-spacing: .6px; }
+
+/* ── Cancel confirmation dialog ── */
+.dialog-backdrop {
+  position: absolute; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: flex-end;
+  animation: fade-in .18s ease;
+}
+.dialog {
+  width: 100%; background: var(--card);
+  border-radius: 22px 22px 0 0;
+  padding: 24px 18px calc(var(--nav-h) + 18px);
+  animation: slide-up .22s cubic-bezier(.32,1,.6,1);
+}
+.dialog-title { font-size: 19px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.dialog-body  { font-size: 13px; color: var(--text-sub); line-height: 1.55; margin-bottom: 22px; }

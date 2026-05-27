@@ -1,0 +1,136 @@
+/* ── Weather widget ── */
+.weather-card {
+  background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+  border: 1.5px solid #FDE68A;
+  padding: 14px 16px 12px;
+}
+.weather-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+.weather-icon-wrap { flex-shrink: 0; margin-top: 2px; }
+.weather-main      { flex: 1; }
+.weather-temp {
+  font-size: 38px; font-weight: 900; line-height: 1;
+  color: #B45309; font-family: 'DM Mono', monospace; letter-spacing: -1px;
+}
+.weather-feels     { font-size: 11.5px; color: #92400E; font-weight: 500; margin-top: 2px; }
+.weather-meta      { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.weather-location  { font-size: 11px; font-weight: 700; color: #78350F; letter-spacing: .4px; }
+.weather-condition { font-size: 11px; color: #A16207; }
+.weather-divider   { height: 1px; background: #FDE68A; margin-bottom: 10px; }
+.weather-metrics   { display: flex; justify-content: space-between; }
+.weather-metric    { display: flex; align-items: center; gap: 5px; }
+.weather-metric-val   { font-size: 12px; font-weight: 600; color: #78350F; }
+.weather-metric-lbl   { font-size: 10px; color: #A16207; margin-top: 1px; }
+.weather-metric-inner { display: flex; flex-direction: column; }
+.uv-badge {
+  display: inline-block; font-size: 9px; font-weight: 700;
+  background: #F59E0B; color: white; border-radius: 4px;
+  padding: 1px 5px; margin-left: 4px; vertical-align: middle;
+}
+
+/* ── Heatstress ring card ── */
+.heat-card {
+  display: flex; align-items: center; justify-content: space-between;
+  border: 2px solid var(--red); padding: 18px 16px;
+}
+.heat-label { font-size: 24px; font-weight: 800; color: var(--text); line-height: 1.1; }
+.ring-wrap  { position: relative; width: 70px; height: 70px; flex-shrink: 0; }
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-bg   { fill: none; stroke: #EEE; stroke-width: 5.5; }
+.ring-fill {
+  fill: none; stroke: var(--red); stroke-width: 5.5; stroke-linecap: round;
+  stroke-dasharray: 175.9;
+  transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);
+}
+.ring-pct {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; font-weight: 800; color: var(--red);
+  font-family: 'DM Mono', monospace;
+}
+
+/* ── Emergency hold card ── */
+.emergency-card {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 52px 20px; cursor: pointer; user-select: none;
+  position: relative; overflow: hidden; min-height: 220px;
+  transition: background .15s;
+}
+.emergency-card:active { background: #FAFAFA; }
+.emerg-icon-box {
+  width: 54px; height: 54px; background: var(--red); border-radius: 13px;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 13px;
+}
+.emerg-title    { font-size: 21px; font-weight: 900; letter-spacing: 1.5px; color: var(--text); text-align: center; line-height: 1.15; }
+.emerg-subtitle { font-size: 10.5px; font-weight: 600; letter-spacing: 2.5px; color: var(--text-muted); margin-top: 5px; }
+.hold-ring-svg {
+  position: absolute; width: 110px; height: 110px;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  pointer-events: none; opacity: 0; transition: opacity .2s;
+}
+.hold-track { fill: none; stroke: #FFCDD2; stroke-width: 4; }
+.hold-fill  {
+  fill: none; stroke: var(--red); stroke-width: 4; stroke-linecap: round;
+  stroke-dasharray: 283; stroke-dashoffset: 283;
+}
+@keyframes hold-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(.965)} }
+.emergency-card.holding { animation: hold-pulse .5s ease infinite; }
+
+/* ── Health card ── */
+.health-card { background: var(--blue-card); border: 1px solid var(--blue-border); padding: 14px 16px 12px; }
+.health-header       { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.health-header-label { font-size: 11.5px; font-weight: 700; color: var(--blue-text); letter-spacing: .5px; }
+.health-chart { width: 100%; height: 58px; overflow: hidden; }
+.health-chart svg { width: 100%; height: 100%; }
+.ekg-line {
+  fill: none; stroke: var(--blue-text); stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.ekg-scroll { display: block; animation: ekg-move 8s linear infinite; }
+@keyframes ekg-move {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.health-status { text-align: right; font-size: 17px; font-weight: 700; color: var(--blue-text); margin-top: 4px; }
+
+/* ── Health info button ── */
+.health-info-btn {
+  background: none; border: none; padding: 2px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; transition: background .15s;
+}
+.health-info-btn:active { background: rgba(0,0,0,0.06); }
+
+/* ── Health detail bottom sheet ── */
+.health-backdrop {
+  position: absolute; inset: 0; z-index: 50;
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(7px) brightness(0.85);
+  -webkit-backdrop-filter: blur(7px) brightness(0.85);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  animation: fade-in .2s ease;
+}
+.health-sheet {
+  background: var(--bg);
+  border-radius: 22px 22px 0 0;
+  padding-bottom: calc(var(--nav-h) + 6px);
+  will-change: transform;
+}
+.sheet-handle {
+  width: 44px; height: 5px; background: #222;
+  border-radius: 3px; margin: 14px auto 20px;
+  cursor: grab; flex-shrink: 0;
+}
+.metric-card {
+  background: var(--card); border-radius: 14px;
+  padding: 13px 16px; margin: 0 14px 10px;
+  border: 1.5px solid var(--border);
+}
+.metric-card.red  { border-color: var(--red); }
+.metric-card.teal { border-color: var(--teal); }
+.metric-header    { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.metric-label     { font-size: 13px; font-weight: 700; color: var(--text); }
+.metric-value-row { display: flex; align-items: center; justify-content: space-between; }
+.metric-value     { font-size: 30px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; }
+.metric-ekg       { width: 72px; height: 28px; flex-shrink: 0; }
+.metric-ekg path  { fill: none; stroke: var(--text-muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.metric-guide     { font-size: 11px; color: var(--text-muted); margin-top: 5px; }

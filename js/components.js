@@ -78,6 +78,7 @@ function makeBottomNav(active = 'alarm') {
       item.innerHTML = `
         ${ICON.info(c)}
         <span class="nav-label" style="color:${c}">${tab.label}</span>`;
+      item.addEventListener('click', () => goTo('firstaid'));
     }
 
     nav.appendChild(item);

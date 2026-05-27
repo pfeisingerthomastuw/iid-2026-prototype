@@ -1,0 +1,63 @@
+/* ── Design tokens ── */
+:root {
+  --red:         #D32F2F;
+  --red-light:   #FFEBEE;
+  --teal:        #00838F;
+  --teal-dark:   #006978;
+  --blue-card:   #D6EAF8;
+  --blue-border: #AED6F1;
+  --blue-text:   #1A6FA0;
+  --bg:          #F0F0F0;
+  --card:        #FFFFFF;
+  --text:        #111111;
+  --text-sub:    #555555;
+  --text-muted:  #888888;
+  --border:      #E0E0E0;
+  --border-mid:  #CCCCCC;
+  --green:       #43A047;
+  --nav-h:       68px;
+  --top-h:       50px;
+  --radius-card: 16px;
+  --radius-btn:  12px;
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box; margin: 0; padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+html, body {
+  width: 100%; height: 100%; overflow: hidden;
+  background: #D8D8D8;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow', sans-serif;
+}
+
+/* ── Phone shell ── */
+#app {
+  width: 390px; height: 844px;
+  background: var(--bg);
+  position: relative; overflow: hidden;
+  border-radius: 44px;
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,0.18),
+    0 40px 100px rgba(0,0,0,0.45),
+    0 8px 30px rgba(0,0,0,0.2);
+}
+
+/* ── Screen transitions ── */
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none;
+  transform: translateX(24px);
+  transition: opacity .28s ease, transform .28s ease;
+}
+.screen.active       { opacity: 1; pointer-events: all; transform: none; }
+.screen.exiting-fwd  { opacity: 0; transform: translateX(-24px); pointer-events: none; }
+.screen.exiting-back { opacity: 0; transform: translateX(24px);  pointer-events: none; }
+
+/* ── Shared animations ── */
+@keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slide-up { from { transform: translateY(100%); } to { transform: translateY(0); } }

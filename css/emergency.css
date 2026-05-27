@@ -1,0 +1,79 @@
+/* ── Emergency page header (screens 2 & 3) ── */
+.emerg-page-header { padding: 16px 14px 0; flex-shrink: 0; }
+.emerg-tag         { font-size: 10.5px; font-weight: 700; letter-spacing: 2.5px; color: var(--red); margin-bottom: 5px; }
+.emerg-tag.teal    { color: var(--teal); }
+.emerg-bar         { height: 3px; background: var(--red); border-radius: 2px; }
+.emerg-bar.teal    { background: var(--teal); }
+.page-heading      { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1.12; margin-bottom: 22px; }
+
+/* ── Screen 2: who-is-affected cards ── */
+.select-card {
+  background: var(--card); border: 1.5px solid var(--border-mid); border-radius: 14px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 11px; padding: 24px 16px; margin-bottom: 12px; cursor: pointer; min-height: 105px;
+  transition: background .12s;
+}
+.select-card:active { background: #F9F9F9; }
+.select-icon-bg {
+  width: 52px; height: 52px; background: #EEEEEE;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+}
+.select-icon-bg.red { background: var(--red-light); }
+.select-label { font-size: 18px; font-weight: 900; letter-spacing: 2.5px; color: var(--text); }
+
+/* ── Screen 3: confirmation ── */
+.confirm-icon {
+  width: 84px; height: 84px; background: var(--teal); border-radius: 22px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 14px auto 18px;
+  animation: pop-in .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes pop-in { from{transform:scale(.5);opacity:0} to{transform:scale(1);opacity:1} }
+.confirm-text { text-align: center; font-size: 13px; line-height: 1.65; color: var(--text-sub); margin-bottom: 20px; }
+
+/* ── Screen 3: extra info / symptoms box ── */
+.extra-box       { border: 2px dashed #CACACA; border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+.extra-box-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+.extra-box-sub   { font-size: 11px; color: var(--text-muted); margin-bottom: 13px; }
+.symptoms-grid   { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 6px; }
+.symptom-row     { display: flex; align-items: flex-start; gap: 6px; cursor: pointer; }
+.sym-check {
+  width: 17px; height: 17px; border: 1.5px solid #BDBDBD; border-radius: 4px;
+  flex-shrink: 0; margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+}
+.symptom-row.checked .sym-check { background: var(--teal); border-color: var(--teal); }
+.sym-label { font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.35; flex: 1; }
+.sym-icon  { font-size: 15px; flex-shrink: 0; }
+
+/* ── Urgent screen theme (affected screen) ── */
+.screen--urgent {
+  background: linear-gradient(160deg, #C62828 0%, #6B0000 100%);
+  animation: urgent-breathe 3s ease-in-out infinite;
+}
+@keyframes urgent-breathe {
+  0%,100% { filter: brightness(1);   }
+  50%      { filter: brightness(1.08); }
+}
+.screen--urgent .topbar             { background: rgba(0,0,0,0.22); border-bottom-color: rgba(255,255,255,0.12); }
+.screen--urgent .topbar-logo        { color: #fff; }
+.screen--urgent .topbar-gps         { color: rgba(255,255,255,0.75); }
+.screen--urgent .topbar-avatar      { background: rgba(255,255,255,0.15); }
+.screen--urgent .topbar-avatar svg  { filter: brightness(0) invert(1); }
+.screen--urgent .emerg-page-header  { padding-top: 20px; }
+.screen--urgent .emerg-tag          { color: rgba(255,255,255,0.75); font-size: 11px; }
+.screen--urgent .emerg-bar          { background: rgba(255,255,255,0.45); }
+.screen--urgent .page-heading       { color: #fff; font-size: 36px; text-shadow: 0 2px 12px rgba(0,0,0,0.25); }
+.screen--urgent .inner-scroll       { background: transparent; }
+.screen--urgent .select-card        { border-color: transparent; box-shadow: 0 6px 24px rgba(0,0,0,0.28); }
+.screen--urgent .select-card:active { background: #f5f5f5; }
+.screen--urgent .cancel-footer      { background: transparent; }
+.screen--urgent .btn-outline        { border-color: rgba(255,255,255,0.4); color: rgba(255,255,255,0.9); }
+.screen--urgent .btn-outline:active { background: rgba(255,255,255,0.1); }
+.screen--urgent .cancel-note        { color: rgba(255,255,255,0.45); }
+.screen--urgent .bottom-nav         { background: rgba(0,0,0,0.22); border-top-color: rgba(255,255,255,0.1); }
+.screen--urgent .nav-label          { color: rgba(255,255,255,0.5); }
+.screen--urgent .alarm-pill         { background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+.screen--urgent .alarm-pill svg     { filter: brightness(0) saturate(100%) invert(17%) sepia(85%) saturate(2000%) hue-rotate(350deg); }
+.screen--urgent .alarm-pill .nav-label { color: var(--red); }
