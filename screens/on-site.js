@@ -19,14 +19,14 @@ registerScreen('on-site', () => {
     <div class="onsite-card-label">YES — CONSCIOUS</div>
     <div class="onsite-card-sub">Responsive to voice or touch</div>
   `;
-  yesCard.addEventListener('click', () => goTo('firstaid'));
+  yesCard.addEventListener('click', () => goTo('support-conscious'));
 
   const noCard = el('div', 'onsite-card red');
   noCard.innerHTML = `
     <div class="onsite-card-label">NO — UNCONSCIOUS</div>
     <div class="onsite-card-sub">Not responding — call 144 immediately</div>
   `;
-  noCard.addEventListener('click', () => goTo('firstaid'));
+  noCard.addEventListener('click', () => goTo('support-unconscious'));
 
   content.append(question, sub, yesCard, noCard);
   screen.append(makeTopBar(), makeEmergHeader(true), content, makeBottomNav());
