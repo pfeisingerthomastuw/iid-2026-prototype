@@ -86,6 +86,37 @@ function makeBottomNav(active = 'alarm') {
   return nav;
 }
 
+// ── Incoming-alert notification banner ──────────────────────
+function showNotificationBanner() {
+  document.querySelectorAll('.notif-banner').forEach(b => b.remove());
+
+  const banner = el('div', 'notif-banner');
+  banner.innerHTML = `
+    <div class="notif-app-icon">CHEN</div>
+    <div class="notif-body">
+      <div class="notif-title">Heat Emergency Nearby</div>
+      <div class="notif-sub">Carl M. · Critical · ~80 m away — tap to respond</div>
+    </div>
+    <button class="notif-dismiss" aria-label="Dismiss">✕</button>
+  `;
+  document.getElementById('app').appendChild(banner);
+
+  requestAnimationFrame(() => requestAnimationFrame(() => banner.classList.add('visible')));
+
+  let dismissed = false;
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+    banner.classList.remove('visible');
+    banner.classList.add('hiding');
+    setTimeout(() => banner.remove(), 320);
+  }
+
+  banner.querySelector('.notif-dismiss').addEventListener('click', e => { e.stopPropagation(); dismiss(); });
+  banner.addEventListener('click', () => { dismiss(); goTo('incoming'); });
+  setTimeout(dismiss, 8000);
+}
+
 // ── Toast notification ───────────────────────────────────────
 function showToast(title, subtitle = '') {
   // Remove any existing toast first

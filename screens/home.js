@@ -91,6 +91,11 @@ registerScreen('home', () => {
       </svg>
     </div>
 
+    <!-- Demo: trigger incoming alert -->
+    <div class="demo-trigger" id="demoTrigger">
+      ⚡ Demo: Simulate incoming alert
+    </div>
+
     <!-- Health Condition -->
     <div class="card health-card">
       <div class="health-header">
@@ -148,9 +153,19 @@ registerScreen('home', () => {
   card.addEventListener('touchcancel', endHold);
 
   // Health detail sheet
-  screen.querySelector('#healthInfoBtn').addEventListener('click', () => {
-    showHealthSheet();
-  });
+  screen.querySelector('#healthInfoBtn').addEventListener('click', () => showHealthSheet());
+
+  // Demo trigger for incoming alert
+  screen.querySelector('#demoTrigger').addEventListener('click', showNotificationBanner);
+
+  // Auto-show notification once on first activation
+  let notifShown = false;
+  screen._onActivate = () => {
+    if (!notifShown) {
+      notifShown = true;
+      setTimeout(showNotificationBanner, 2000);
+    }
+  };
 
   return screen;
 });

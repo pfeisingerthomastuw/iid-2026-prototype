@@ -47,7 +47,14 @@ registerScreen('reported', () => {
   shareBtn.addEventListener('click', () =>
     showToast('Information shared', 'Your responder has been notified'));
 
-  scroll.append(heading, confirmIcon, confirmText, extraBox, shareBtn);
+  // Location map
+  const mapWrap = el('div', 'reported-map-wrap');
+  const mapLabel = el('div', 'reported-map-label');
+  mapLabel.textContent = 'YOUR LOCATION IS BEING SHARED';
+  const mapDiv = el('div', 'reported-map');
+  mapWrap.append(mapLabel, mapDiv);
+
+  scroll.append(heading, confirmIcon, confirmText, extraBox, shareBtn, mapWrap);
 
   const footer = el('div', 'cancel-footer');
   const cancelBtn = el('button', 'btn-outline');
@@ -59,12 +66,39 @@ registerScreen('reported', () => {
 
   screen.append(makeTopBar(), makeEmergHeader(true), scroll, footer, makeBottomNav());
 
-  // Re-trigger the pop-in animation each time this screen is shown
+  const USER_COORDS = [48.1972, 16.3488];
+  let map = null;
+
+  const userIcon = L.divIcon({
+    className: '',
+    html: `<div class="help-marker-wrap">
+             <div class="help-pulse"></div>
+             <div class="help-pulse" style="animation-delay:.6s"></div>
+             <div class="help-dot"></div>
+           </div>`,
+    iconSize: [36, 36], iconAnchor: [18, 18],
+  });
+
   screen._onActivate = () => {
     const icon = screen.querySelector('.confirm-icon');
     icon.style.animation = 'none';
     void icon.offsetWidth;
     icon.style.animation = '';
+
+    setTimeout(() => {
+      if (!map) {
+        map = L.map(mapDiv, {
+          center: USER_COORDS, zoom: 15,
+          zoomControl: false, attributionControl: false,
+          dragging: false, scrollWheelZoom: false,
+          doubleClickZoom: false, touchZoom: false,
+        });
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { maxZoom: 20 }).addTo(map);
+        L.marker(USER_COORDS, { icon: userIcon }).addTo(map);
+      } else {
+        map.invalidateSize();
+      }
+    }, 300);
   };
 
   return screen;

@@ -43,6 +43,25 @@ const DATA = {
     { id: 'firstaid', label: 'First Aid', alarm: false },
   ],
 
+  // Incident data — used by Task 2 responder flow
+  incident: {
+    victim:       { name: 'Carl M.', coords: [48.1998, 16.3489], status: 'critical' },
+    distance:     '~80 m',
+    role:         'First Responder',
+    roleDesc:     'Provide immediate cooling and hydration support',
+    vitals: [
+      { label: 'Heart Rate',       badge: 'Critically Elevated', color: 'red',  value: '168 BPM', normal: '60–100 bpm'    },
+      { label: 'Body Temperature', badge: 'Dangerously High',    color: 'red',  value: '39.2 °C', normal: '36.1–37.2 °C' },
+    ],
+    itemsToBring: ['Water bottle', 'Cooling pack', 'Shade cloth'],
+  },
+
+  // Other responders shown in coordination sheet
+  responders: [
+    { initials: 'JK', name: 'Jana K.',  role: 'First Aid Certified', status: 'en-route', eta: '~2 min'  },
+    { initials: 'LB', name: 'Lukas B.', role: 'Coworker',            status: 'arrived',  eta: 'Arrived' },
+  ],
+
   // People in need shown on the help map
   peopleInNeed: [
     { coords: [48.2089, 16.3732], name: 'Max M.',   status: 'critical' },

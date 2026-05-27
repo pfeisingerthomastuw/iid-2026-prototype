@@ -47,6 +47,23 @@
 .sym-label { font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.35; flex: 1; }
 .sym-icon  { font-size: 15px; flex-shrink: 0; }
 
+/* ── Screen 3: location map ── */
+.reported-map-wrap {
+  border-radius: 14px; overflow: hidden;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.reported-map-label {
+  background: var(--teal); color: #fff;
+  font-size: 9.5px; font-weight: 800; letter-spacing: 2px;
+  text-align: center; padding: 6px 0;
+}
+.reported-map {
+  height: 180px;
+  width: 100%;
+}
+.reported-map .leaflet-container { width: 100%; height: 100%; }
+
 /* ── Urgent screen theme (affected screen) ── */
 .screen--urgent {
   background: linear-gradient(160deg, #C62828 0%, #6B0000 100%);

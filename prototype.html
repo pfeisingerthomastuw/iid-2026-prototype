@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="css/map.css"/>
   <link rel="stylesheet" href="css/help-map.css"/>
   <link rel="stylesheet" href="css/firstaid.css"/>
+  <link rel="stylesheet" href="css/task2.css"/>
 </head>
 <body>
 <div id="app"></div>
@@ -31,6 +32,10 @@
 <script src="screens/map.js"></script>
 <script src="screens/help-map.js"></script>
 <script src="screens/firstaid.js"></script>
+<script src="screens/incoming.js"></script>
+<script src="screens/request-detail.js"></script>
+<script src="screens/responder-nav.js"></script>
+<script src="screens/on-site.js"></script>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -80,9 +85,10 @@ window.addEventListener('popstate', e => {
   goTo(id, id === 'home' ? 'back' : 'forward', true);
 });
 
-// Seed initial history entry so back button works from first screen
-history.replaceState({ screenId: 'home' }, '');
-goTo('home', 'forward', true);
+// Seed initial history entry — honour ?start= param (e.g. from alert.html)
+const startScreen = new URLSearchParams(location.search).get('start') ?? 'home';
+history.replaceState({ screenId: startScreen }, '');
+goTo(startScreen, 'forward', true);
 </script>
 </body>
 </html>

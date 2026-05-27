@@ -26,7 +26,7 @@ registerScreen('firstaid', () => {
     },
     {
       num: 3,
-      title: 'Give fluids if conscious',
+      title: 'Give water if conscious',
       body: 'If the person is awake and can swallow, offer small sips of cool water. Avoid alcohol or caffeine.',
       icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00838F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M5 8h14l-1.5 9.5a2 2 0 0 1-2 1.5H8.5a2 2 0 0 1-2-1.5L5 8z"/>
