@@ -44,8 +44,20 @@ registerScreen('resolve', () => {
   // ── Return home ───────────────────────────
   const homeBtn = el('button', 'btn-teal');
   homeBtn.style.width = '100%';
-  homeBtn.textContent = 'Return to Home';
-  homeBtn.addEventListener('click', () => goTo('home'));
+  homeBtn.textContent = 'Patient is Stable — Close Incident';
+  homeBtn.addEventListener('click', () => {
+    showConfirmDialog({
+      title:        'Confirm patient is stable?',
+      body:         'Only confirm if the patient is no longer in immediate danger and no further help is needed.',
+      confirmLabel: 'Yes, close incident',
+      cancelLabel:  '← Keep monitoring',
+      confirmClass: 'btn-teal',
+      onConfirm:    () => {
+        goTo('home');
+        showToast('Incident closed', 'Thank you for your help today.');
+      },
+    });
+  });
 
   content.append(icon, heading, sub, statsRow, message, homeBtn);
   screen.append(makeTopBar(), content, makeBottomNav());

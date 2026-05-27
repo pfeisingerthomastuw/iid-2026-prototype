@@ -5,37 +5,16 @@
    "I've arrived" button.
 ───────────────────────────────────────── */
 registerScreen('responder-nav', () => {
-  const USER_COORDS   = [48.1972, 16.3488];
-  const VICTIM_COORDS = DATA.incident.victim.coords;
+  const USER_COORDS = [48.1972, 16.3488];
 
   const screen = el('div', 'screen');
   const mapDiv = el('div', 'map-viewport');
 
   // ── Top info card ─────────────────────────
   const topCard = el('div', 'rnav-top-card');
-  topCard.innerHTML = `
-    <div class="rnav-top-row">
-      <div class="rnav-status-dot"></div>
-      <div class="rnav-name">Navigating to ${DATA.incident.victim.name}</div>
-      <span class="hd-pill critical">${DATA.incident.victim.status}</span>
-    </div>
-    <div class="rnav-stats">
-      <div class="rnav-stat"><strong id="rnavEta">Calculating…</strong> ETA</div>
-      <div class="rnav-stat"><strong id="rnavDist">—</strong> on foot</div>
-    </div>
-  `;
 
   // ── Coordination strip ────────────────────
   const coordStrip = el('div', 'rnav-coord-strip');
-  const avatarColors = ['teal', 'red'];
-  const avatarHTML = DATA.responders.map((r, i) =>
-    `<div class="rnav-avatar ${avatarColors[i] ?? 'red'}">${r.initials}</div>`
-  ).join('');
-  coordStrip.innerHTML = `
-    <div class="rnav-coord-avatars">${avatarHTML}</div>
-    <div class="rnav-coord-text">${DATA.responders.length} others also responding</div>
-    <div class="rnav-coord-arrow">›</div>
-  `;
   coordStrip.addEventListener('click', showCoordinationSheet);
 
   // ── Arrived button ────────────────────────
@@ -75,10 +54,52 @@ registerScreen('responder-nav', () => {
     iconSize: [36, 36], iconAnchor: [18, 18],
   });
 
-  // ── Map init ──────────────────────────────
+  // ── Map state ─────────────────────────────
   let map = null;
+  let lastVictimCoords = null;
 
+  // ── UI refresh ────────────────────────────
+  function refreshUI() {
+    const v = DATA.incident;
+    const isCrit = v.victim.status === 'critical';
+
+    topCard.innerHTML = `
+      <div class="rnav-top-row">
+        <div class="rnav-status-dot"></div>
+        <div class="rnav-name">Navigating to ${v.victim.name}</div>
+        <span class="hd-pill ${isCrit ? 'critical' : 'warning'}">${v.victim.status}</span>
+      </div>
+      <div class="rnav-stats">
+        <div class="rnav-stat"><strong id="rnavEta">Calculating…</strong> ETA</div>
+        <div class="rnav-stat"><strong id="rnavDist">—</strong> on foot</div>
+      </div>
+    `;
+
+    const avatarColors = ['teal', 'red'];
+    const avatarHTML = v.responders.map((r, i) =>
+      `<div class="rnav-avatar ${avatarColors[i] ?? 'red'}">${r.initials}</div>`
+    ).join('');
+    coordStrip.innerHTML = `
+      <div class="rnav-coord-avatars">${avatarHTML}</div>
+      <div class="rnav-coord-text">${v.responders.length} others also responding</div>
+      <div class="rnav-coord-arrow">›</div>
+    `;
+  }
+
+  // ── Map init ──────────────────────────────
   screen._onActivate = () => {
+    refreshUI();
+
+    const victimCoords = DATA.incident.victim.coords;
+
+    // Destroy and recreate map if the victim changed
+    if (map && lastVictimCoords &&
+        (lastVictimCoords[0] !== victimCoords[0] || lastVictimCoords[1] !== victimCoords[1])) {
+      map.remove();
+      map = null;
+    }
+    lastVictimCoords = victimCoords;
+
     setTimeout(async () => {
       if (!map) {
         map = L.map(mapDiv, {
@@ -91,11 +112,11 @@ registerScreen('responder-nav', () => {
         ).addTo(map);
 
         L.marker(USER_COORDS,   { icon: userIcon   }).addTo(map);
-        L.marker(VICTIM_COORDS, { icon: victimIcon }).addTo(map);
+        L.marker(victimCoords,  { icon: victimIcon }).addTo(map);
 
         // Fetch OSRM walking route
         const [uLat, uLon] = USER_COORDS;
-        const [pLat, pLon] = VICTIM_COORDS;
+        const [pLat, pLon] = victimCoords;
         const url = `https://router.project-osrm.org/route/v1/foot/`
           + `${uLon},${uLat};${pLon},${pLat}?overview=full&geometries=geojson`;
 
@@ -105,9 +126,11 @@ registerScreen('responder-nav', () => {
           ({ duration, distance } = data.routes[0]);
           geojson = data.routes[0].geometry;
         } catch (_) {
-          const d = haversine(USER_COORDS, VICTIM_COORDS);
+          const d = haversine(USER_COORDS, victimCoords);
           duration = d / (5000 / 3600); distance = d;
           geojson  = { type: 'LineString', coordinates: [[uLon, uLat], [pLon, pLat]] };
+          const banner = showErrorBanner('No internet — showing direct path. Follow local signage.');
+          screen.insertBefore(banner, mapDiv.nextSibling);
         }
 
         L.geoJSON(geojson, {
@@ -140,8 +163,7 @@ registerScreen('responder-nav', () => {
 
     sheet.append(handle, title);
 
-    // Other responders
-    DATA.responders.forEach((r, i) => {
+    DATA.incident.responders.forEach((r, i) => {
       const item        = el('div', 'coord-sheet-item');
       const avatarColor = i === 0 ? 'teal' : 'grey';
       const statusClass = r.status === 'arrived' ? 'arrived' : 'en-route';
@@ -157,7 +179,6 @@ registerScreen('responder-nav', () => {
       sheet.appendChild(item);
     });
 
-    // "You" entry
     const youItem = el('div', 'coord-sheet-item');
     youItem.innerHTML = `
       <div class="coord-avatar-large" style="background:#4285F4">YOU</div>
@@ -172,7 +193,6 @@ registerScreen('responder-nav', () => {
     backdrop.appendChild(sheet);
     document.getElementById('app').appendChild(backdrop);
 
-    // Slide in
     sheet.style.transform = 'translateY(100%)';
     requestAnimationFrame(() => {
       sheet.style.transition = 'transform .28s cubic-bezier(.32,1,.6,1)';
@@ -189,7 +209,6 @@ registerScreen('responder-nav', () => {
 
     backdrop.addEventListener('click', e => { if (e.target === backdrop) dismiss(); });
 
-    // Drag-to-dismiss
     let startY = 0, dragY = 0, dragging = false;
     sheet.addEventListener('touchstart', e => {
       dragging = true; startY = e.touches[0].clientY; sheet.style.transition = 'none';

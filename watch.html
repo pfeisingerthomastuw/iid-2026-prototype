@@ -47,9 +47,12 @@
     .watch-screen.exit   { opacity: 0; transform: scale(1.04); pointer-events: none; }
 
     /* ── Shared animations ── */
-    @keyframes pop-in   { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    @keyframes fade-in  { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes breathe  { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.12); } }
+    @keyframes pop-in     { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    @keyframes fade-in    { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes breathe    { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.12); } }
+    @keyframes alert-ring { 0% { transform: scale(1); opacity: .8; } 100% { transform: scale(2.2); opacity: 0; } }
+    @keyframes gps-pulse  { 0%,100% { box-shadow: 0 0 0 0 rgba(67,160,71,.5); } 50% { box-shadow: 0 0 0 3px rgba(67,160,71,0); } }
+    @keyframes ekg-move   { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
     /* ══════════════════════════════════════
        SCREEN 1 — WATCH FACE
@@ -57,7 +60,7 @@
     #screen-face {
       background: #1C1C1E;
       justify-content: space-between;
-      padding: 38px 28px 36px;
+      padding: 38px 28px 30px;
     }
 
     .wf-top {
@@ -73,10 +76,6 @@
     .gps-dot {
       width: 5px; height: 5px; background: #43A047; border-radius: 50%;
       animation: gps-pulse 2.4s ease-in-out infinite;
-    }
-    @keyframes gps-pulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(67,160,71,.5); }
-      50%      { box-shadow: 0 0 0 3px rgba(67,160,71,0); }
     }
 
     /* Heat ring */
@@ -127,11 +126,10 @@
       stroke-linecap: round; stroke-linejoin: round;
     }
     .ekg-scroll-mini { animation: ekg-move 4s linear infinite; }
-    @keyframes ekg-move { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
     /* SOS button */
     .wf-sos {
-      width: 100%; height: 56px;
+      width: 100%; height: 52px;
       background: #D32F2F; border: none; border-radius: 18px;
       font-family: 'Barlow', sans-serif;
       font-size: 16px; font-weight: 900; letter-spacing: 3px; color: #fff;
@@ -141,6 +139,15 @@
       flex-shrink: 0;
     }
     .wf-sos:active { transform: scale(.96); background: #B71C1C; }
+
+    /* Demo trigger chip */
+    .wf-demo {
+      font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+      color: rgba(255,255,255,0.2); cursor: pointer; padding: 4px 8px;
+      border: 1px dashed rgba(255,255,255,0.12); border-radius: 8px;
+      transition: color .15s, border-color .15s; margin-top: -4px;
+    }
+    .wf-demo:active { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.25); }
 
     /* ══════════════════════════════════════
        SCREEN 2 — SOS HOLD
@@ -198,7 +205,6 @@
       background: #1C1C1E;
       justify-content: center; gap: 16px;
       padding: 36px 28px;
-      cursor: pointer;
     }
 
     .sent-check {
@@ -213,11 +219,81 @@
     .sent-sub {
       font-size: 12px; color: rgba(255,255,255,0.5); text-align: center; line-height: 1.6;
     }
-    .sent-tap {
-      font-size: 9px; font-weight: 700; letter-spacing: 2px;
-      color: rgba(255,255,255,0.2); text-transform: uppercase;
-      position: absolute; bottom: 48px;
+    .sent-open-btn {
+      width: 100%; padding: 13px; background: rgba(0,131,143,0.25);
+      border: 1.5px solid rgba(0,131,143,0.5); border-radius: 14px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: .5px; color: #4DD0E1;
+      cursor: pointer; transition: background .12s; text-align: center; margin-top: 4px;
     }
+    .sent-open-btn:active { background: rgba(0,131,143,0.4); }
+
+    /* ══════════════════════════════════════
+       SCREEN 4 — INCOMING ALERT
+    ══════════════════════════════════════ */
+    #screen-incoming {
+      background: linear-gradient(160deg, #F57F17 0%, #BF360C 100%);
+      animation: breathe 2.5s ease-in-out infinite;
+      justify-content: space-between;
+      padding: 44px 28px 44px;
+    }
+
+    /* Pulsing rings behind icon */
+    .inc-icon-wrap {
+      position: relative; width: 68px; height: 68px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .inc-ring {
+      position: absolute; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      animation: alert-ring 2s ease-out infinite;
+    }
+    .inc-ring-1 { width: 68px; height: 68px; animation-delay: 0s; }
+    .inc-ring-2 { width: 68px; height: 68px; animation-delay: .6s; }
+    .inc-ring-3 { width: 68px; height: 68px; animation-delay: 1.2s; }
+    .inc-icon-bg {
+      width: 52px; height: 52px; background: rgba(255,255,255,0.18); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .inc-body {
+      display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1;
+      justify-content: center;
+    }
+    .inc-tag {
+      font-size: 9px; font-weight: 800; letter-spacing: 3px;
+      color: rgba(255,255,255,0.6); text-transform: uppercase;
+    }
+    .inc-title {
+      font-size: 20px; font-weight: 900; letter-spacing: .5px;
+      color: #fff; text-align: center; line-height: 1.2;
+    }
+    .inc-detail {
+      font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.6);
+      text-align: center; line-height: 1.5;
+    }
+    .inc-pill {
+      background: rgba(255,255,255,0.18); border-radius: 20px;
+      padding: 3px 10px; font-size: 9.5px; font-weight: 800;
+      letter-spacing: 1px; color: #fff; margin-top: 2px;
+    }
+
+    .inc-actions { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+    .inc-help-btn {
+      width: 100%; padding: 14px; background: #00838F; border: none; border-radius: 16px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px; font-weight: 800; letter-spacing: .5px; color: #fff;
+      cursor: pointer; transition: background .12s;
+      box-shadow: 0 4px 16px rgba(0,131,143,0.5);
+    }
+    .inc-help-btn:active { background: #006978; }
+    .inc-pass-btn {
+      width: 100%; padding: 11px; background: rgba(255,255,255,0.1); border: none; border-radius: 14px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: .5px; color: rgba(255,255,255,0.6);
+      cursor: pointer; transition: background .12s;
+    }
+    .inc-pass-btn:active { background: rgba(255,255,255,0.18); }
   </style>
 </head>
 <body>
@@ -268,6 +344,7 @@
     </div>
 
     <button class="wf-sos" id="sosBtn">SOS</button>
+    <div class="wf-demo" id="demoBtn">⚡ DEMO ALERT</div>
   </div>
 
   <!-- Screen 2: SOS hold -->
@@ -292,7 +369,7 @@
     <button class="sos-cancel" id="sosCancelBtn">CANCEL</button>
   </div>
 
-  <!-- Screen 3: Sent -->
+  <!-- Screen 3: Sent confirmation -->
   <div class="watch-screen" id="screen-sent">
     <div class="sent-check" id="sentCheck">
       <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
@@ -301,16 +378,47 @@
     </div>
     <div class="sent-title">Help is<br>coming</div>
     <div class="sent-sub">Emergency services notified.<br>Your location is being shared.</div>
-    <div class="sent-tap">Tap to dismiss</div>
+    <button class="sent-open-btn" id="sentOpenBtn">Open on phone →</button>
+  </div>
+
+  <!-- Screen 4: Incoming alert (Task 2 entry) -->
+  <div class="watch-screen" id="screen-incoming">
+    <div class="inc-icon-wrap">
+      <div class="inc-ring inc-ring-1"></div>
+      <div class="inc-ring inc-ring-2"></div>
+      <div class="inc-ring inc-ring-3"></div>
+      <div class="inc-icon-bg">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white"
+          stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0
+            1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9"  x2="12" y2="13"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="inc-body">
+      <div class="inc-tag">Nearby Emergency</div>
+      <div class="inc-title">HEAT<br>EMERGENCY</div>
+      <div class="inc-detail">Carl M. &nbsp;·&nbsp; ~80 m away</div>
+      <div class="inc-pill">CRITICAL</div>
+    </div>
+
+    <div class="inc-actions">
+      <button class="inc-help-btn" id="incHelpBtn">✓ &nbsp;I can help</button>
+      <button class="inc-pass-btn" id="incPassBtn">Unavailable right now</button>
+    </div>
   </div>
 
 </div>
 
 <script>
   const SCREENS = {
-    face: document.getElementById('screen-face'),
-    sos:  document.getElementById('screen-sos'),
-    sent: document.getElementById('screen-sent'),
+    face:     document.getElementById('screen-face'),
+    sos:      document.getElementById('screen-sos'),
+    sent:     document.getElementById('screen-sent'),
+    incoming: document.getElementById('screen-incoming'),
   };
   let current = 'face';
 
@@ -318,7 +426,6 @@
     SCREENS[current].classList.remove('active');
     SCREENS[current].classList.add('exit');
     setTimeout(() => SCREENS[current].classList.remove('exit'), 250);
-
     current = id;
     SCREENS[id].classList.add('active');
 
@@ -331,27 +438,28 @@
   }
 
   // ── Heat ring init ──
-  const CIRC = 2 * Math.PI * 100; // r=100 → ~628.3
+  const CIRC = 2 * Math.PI * 100;
   const ring = document.getElementById('heatRing');
   ring.style.strokeDasharray  = CIRC;
   ring.style.strokeDashoffset = CIRC * (1 - 0.75);
 
-  // ── SOS button → SOS hold screen ──
+  // ── Watch face ──
   document.getElementById('sosBtn').addEventListener('click', () => goTo('sos'));
+  document.getElementById('demoBtn').addEventListener('click', () => goTo('incoming'));
+
+  // ── SOS hold ──
   document.getElementById('sosCancelBtn').addEventListener('click', () => {
     cancelHold();
     goTo('face');
   });
 
-  // ── Hold-to-send logic ──
-  const HOLD_MS   = 2000;
-  const holdArc   = document.getElementById('holdArc');
-  const holdCirc  = 2 * Math.PI * 90; // r=90 → ~565.5
+  const HOLD_MS  = 2000;
+  const holdArc  = document.getElementById('holdArc');
+  const holdCirc = 2 * Math.PI * 90;
   holdArc.style.strokeDasharray  = holdCirc;
   holdArc.style.strokeDashoffset = holdCirc;
 
-  let holdStart = null;
-  let holdRaf   = null;
+  let holdStart = null, holdRaf = null;
 
   function cancelHold() {
     if (holdRaf) { cancelAnimationFrame(holdRaf); holdRaf = null; }
@@ -365,7 +473,6 @@
     if (!holdStart) holdStart = ts;
     const progress = Math.min((ts - holdStart) / HOLD_MS, 1);
     holdArc.style.strokeDashoffset = holdCirc * (1 - progress);
-
     if (progress < 1) {
       holdRaf = requestAnimationFrame(tickHold);
     } else {
@@ -376,18 +483,31 @@
   }
 
   const sosRingWrap = document.getElementById('sosRingWrap');
+  sosRingWrap.addEventListener('mousedown',  () => { holdRaf = requestAnimationFrame(tickHold); });
+  sosRingWrap.addEventListener('touchstart', () => { holdRaf = requestAnimationFrame(tickHold); }, { passive: true });
+  sosRingWrap.addEventListener('mouseup',    () => { if (holdStart) cancelHold(); });
+  sosRingWrap.addEventListener('mouseleave', () => { if (holdStart) cancelHold(); });
+  sosRingWrap.addEventListener('touchend',   () => { if (holdStart) cancelHold(); });
 
-  function startHold() { holdRaf = requestAnimationFrame(tickHold); }
-  function releaseHold() { if (holdStart) cancelHold(); }
+  // ── Sent screen ──
+  document.getElementById('sentOpenBtn').addEventListener('click', () => {
+    window.open('prototype.html?start=reported', '_blank');
+  });
 
-  sosRingWrap.addEventListener('mousedown',  startHold);
-  sosRingWrap.addEventListener('touchstart', startHold, { passive: true });
-  sosRingWrap.addEventListener('mouseup',    releaseHold);
-  sosRingWrap.addEventListener('mouseleave', releaseHold);
-  sosRingWrap.addEventListener('touchend',   releaseHold);
+  // ── Incoming alert screen ──
+  document.getElementById('incHelpBtn').addEventListener('click', () => {
+    window.open('prototype.html?start=incoming', '_blank');
+  });
+  document.getElementById('incPassBtn').addEventListener('click', () => goTo('face'));
 
-  // ── Sent screen: tap to go back to face ──
-  document.getElementById('screen-sent').addEventListener('click', () => goTo('face'));
+  // ── Auto-show incoming alert after 3s (demo) ──
+  let alertShown = false;
+  setTimeout(() => {
+    if (!alertShown && current === 'face') {
+      alertShown = true;
+      goTo('incoming');
+    }
+  }, 3000);
 </script>
 </body>
 </html>

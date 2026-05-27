@@ -37,29 +37,42 @@ const DATA = {
 
   // Bottom nav tabs — order determines display order
   navTabs: [
-    { id: 'alarm',    label: 'Alarm',     alarm: true  },
-    { id: 'map',      label: 'Map',       alarm: false },
-    { id: 'help',     label: 'Help',      alarm: false },
-    { id: 'firstaid', label: 'First Aid', alarm: false },
+    { id: 'alarm', label: 'Alarm', alarm: true  },
+    { id: 'map',   label: 'Map',   alarm: false },
+    { id: 'help',  label: 'Help',  alarm: false },
   ],
 
-  // Incident data — used by Task 2 responder flow
-  incident: {
-    victim:       { name: 'Carl M.', coords: [48.1998, 16.3489], status: 'critical' },
-    distance:     '~80 m',
-    role:         'First Responder',
-    roleDesc:     'Provide immediate cooling and hydration support',
-    vitals: [
-      { label: 'Heart Rate',       badge: 'Critically Elevated', color: 'red',  value: '168 BPM', normal: '60–100 bpm'    },
-      { label: 'Body Temperature', badge: 'Dangerously High',    color: 'red',  value: '39.2 °C', normal: '36.1–37.2 °C' },
-    ],
-    itemsToBring: ['Water bottle', 'Cooling pack', 'Shade cloth'],
-  },
-
-  // Other responders shown in coordination sheet
-  responders: [
-    { initials: 'JK', name: 'Jana K.',  role: 'First Aid Certified', status: 'en-route', eta: '~2 min'  },
-    { initials: 'LB', name: 'Lukas B.', role: 'Coworker',            status: 'arrived',  eta: 'Arrived' },
+  // All available incident scenarios — active one set below
+  incidents: [
+    {
+      victim:       { name: 'Carl M.', coords: [48.1998, 16.3489], status: 'critical' },
+      distance:     '~80 m',
+      role:         'First Responder',
+      roleDesc:     'Provide immediate cooling and hydration support',
+      vitals: [
+        { label: 'Heart Rate',       badge: 'Critically Elevated', color: 'red',    level: 4, value: '168 BPM', normal: '60–100 bpm'    },
+        { label: 'Body Temperature', badge: 'Dangerously High',    color: 'red',    level: 4, value: '39.2 °C', normal: '36.1–37.2 °C' },
+      ],
+      itemsToBring: ['Water bottle', 'Cooling pack', 'Shade cloth'],
+      responders: [
+        { initials: 'JK', name: 'Jana K.',  role: 'First Aid Certified', status: 'en-route', eta: '~2 min'  },
+        { initials: 'LB', name: 'Lukas B.', role: 'Coworker',            status: 'arrived',  eta: 'Arrived' },
+      ],
+    },
+    {
+      victim:       { name: 'Stefan W.', coords: [48.1985, 16.3510], status: 'moderate' },
+      distance:     '~150 m',
+      role:         'Support — Water & Shade',
+      roleDesc:     'Bring water and provide shade for the affected worker',
+      vitals: [
+        { label: 'Heart Rate',       badge: 'Elevated',          color: 'orange', level: 2, value: '118 BPM', normal: '60–100 bpm'    },
+        { label: 'Body Temperature', badge: 'Slightly Elevated', color: 'orange', level: 2, value: '38.0 °C', normal: '36.1–37.2 °C' },
+      ],
+      itemsToBring: ['Water bottle', 'Umbrella or shade cloth'],
+      responders: [
+        { initials: 'MR', name: 'Mia R.', role: 'Trained Volunteer', status: 'en-route', eta: '~4 min' },
+      ],
+    },
   ],
 
   // People in need shown on the help map
@@ -72,3 +85,6 @@ const DATA = {
     { coords: [48.2060, 16.3510], name: 'Eva R.',   status: 'moderate' },
   ],
 };
+
+// Active incident — reassigned by demo triggers before navigating
+DATA.incident = DATA.incidents[0];

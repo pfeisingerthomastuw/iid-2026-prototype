@@ -16,9 +16,14 @@ registerScreen('support-unconscious', () => {
       <line x1="12" y1="9"  x2="12" y2="13"/>
       <line x1="12" y1="17" x2="12.01" y2="17"/>
     </svg>
-    <div class="unconscious-hero-title">${DATA.incident.victim.name} is UNCONSCIOUS</div>
+    <div class="unconscious-hero-title" id="suHeroTitle">… is UNCONSCIOUS</div>
     <div class="unconscious-hero-sub">Follow steps — call 144 immediately</div>
+    <button class="support-skip-btn">Skip — I know what to do →</button>
   `;
+  hero.querySelector('.support-skip-btn').addEventListener('click', () => {
+    DATA.session = { startTime: Date.now(), path: 'unconscious', checksCompleted: 0, total: checks.length };
+    goTo('resolve');
+  });
 
   const content = el('div', 'support-content');
 
@@ -115,6 +120,9 @@ registerScreen('support-unconscious', () => {
   let timerInterval = null;
 
   screen._onActivate = () => {
+    const heroTitle = document.getElementById('suHeroTitle');
+    if (heroTitle) heroTitle.textContent = `${DATA.incident.victim.name} is UNCONSCIOUS`;
+
     startTs = Date.now();
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {

@@ -16,67 +16,89 @@ registerScreen('request-detail', () => {
     <div class="page-heading" style="margin-bottom:0">Your role</div>
   `;
 
-  // ── Role section ──────────────────────────
-  const roleSection = el('div', 'rd-section');
-  roleSection.innerHTML = `
-    <div class="rd-role-badge">
-      <div class="rd-role-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-          stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-          <circle cx="9" cy="7" r="4"/>
-          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-        </svg>
-      </div>
-      <div>
-        <div class="rd-role-name">${DATA.incident.role}</div>
-        <div class="rd-role-desc">${DATA.incident.roleDesc}</div>
-      </div>
-    </div>
-  `;
-
-  // ── Vitals section ────────────────────────
+  // ── Dynamic sections (rebuilt on activate) ─
+  const roleSection   = el('div', 'rd-section');
   const vitalsSection = el('div', 'rd-section');
-  const vitalsTitle   = el('div', 'rd-section-title');
-  vitalsTitle.textContent = 'Patient vitals';
-  vitalsSection.appendChild(vitalsTitle);
+  const itemsSection  = el('div', 'rd-section');
 
-  DATA.incident.vitals.forEach(vt => {
-    const row = el('div', 'rd-vital-row');
-    row.innerHTML = `
-      <div class="rd-vital-left">
-        <div class="rd-vital-label">${vt.label}</div>
-        <div class="rd-vital-badge ${vt.color}">
-          <div class="rd-vital-badge-dot"></div>
-          <span class="rd-vital-badge-text">${vt.badge}</span>
+  const SEV_COLORS = ['#4CAF50', '#FFC107', '#FF9800', '#D32F2F'];
+  const SEV_LABELS = ['Normal', 'Moderate', 'Elevated', 'Critical'];
+
+  function refresh() {
+    const v = DATA.incident;
+
+    // Role
+    roleSection.innerHTML = `
+      <div class="rd-role-badge">
+        <div class="rd-role-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div>
+          <div class="rd-role-name">${v.role}</div>
+          <div class="rd-role-desc">${v.roleDesc}</div>
         </div>
       </div>
-      <button class="rd-vital-info-btn" aria-label="Show raw value">ⓘ</button>
     `;
-    const detail = el('div', 'rd-vital-detail');
-    detail.innerHTML = `<strong>${vt.value}</strong> &nbsp;·&nbsp; Normal range: ${vt.normal}`;
-    detail.hidden = true;
-    row.appendChild(detail);
 
-    row.querySelector('.rd-vital-info-btn').addEventListener('click', () => {
-      detail.hidden = !detail.hidden;
+    // Vitals
+    vitalsSection.innerHTML = '';
+    const vitalsTitle = el('div', 'rd-section-title');
+    vitalsTitle.textContent = 'Patient vitals';
+    vitalsSection.appendChild(vitalsTitle);
+
+    v.vitals.forEach(vt => {
+      const row = el('div', 'rd-vital-row');
+
+      const scaleHtml = SEV_LABELS.map((lbl, i) => {
+        const filled = i < vt.level;
+        const isTop  = i === vt.level - 1;
+        return `<div class="rd-sev-seg${isTop ? ' rd-sev-top' : ''}"
+                     style="background:${filled ? SEV_COLORS[i] : '#EEEEEE'}"
+                     aria-label="${lbl}"></div>`;
+      }).join('');
+
+      row.innerHTML = `
+        <div class="rd-vital-left">
+          <div class="rd-vital-label">${vt.label}</div>
+          <div class="rd-vital-state ${vt.color}">
+            <span class="rd-vital-state-dot"></span>
+            <span class="rd-vital-state-text">${vt.badge}</span>
+          </div>
+          <div class="rd-sev-scale">${scaleHtml}</div>
+        </div>
+        <button class="rd-vital-info-btn" aria-label="Show details">ⓘ</button>
+      `;
+
+      const detail = el('div', 'rd-vital-detail');
+      detail.innerHTML = `<strong>${vt.value}</strong> &nbsp;·&nbsp; Normal range: ${vt.normal}`;
+      detail.hidden = true;
+      row.appendChild(detail);
+
+      row.querySelector('.rd-vital-info-btn').addEventListener('click', () => {
+        detail.hidden = !detail.hidden;
+      });
+
+      vitalsSection.appendChild(row);
     });
 
-    vitalsSection.appendChild(row);
-  });
+    // Items
+    itemsSection.innerHTML = '';
+    const itemsTitle = el('div', 'rd-section-title');
+    itemsTitle.textContent = 'Bring these items';
+    itemsSection.appendChild(itemsTitle);
 
-  // ── Items section ─────────────────────────
-  const itemsSection = el('div', 'rd-section');
-  const itemsTitle   = el('div', 'rd-section-title');
-  itemsTitle.textContent = 'Bring these items';
-  itemsSection.appendChild(itemsTitle);
-
-  DATA.incident.itemsToBring.forEach(item => {
-    const row = el('div', 'rd-item-row');
-    row.innerHTML = `<div class="rd-item-dot"></div><span>${item}</span>`;
-    itemsSection.appendChild(row);
-  });
+    v.itemsToBring.forEach(item => {
+      const row = el('div', 'rd-item-row');
+      row.innerHTML = `<div class="rd-item-dot"></div><span>${item}</span>`;
+      itemsSection.appendChild(row);
+    });
+  }
 
   // ── Actions ───────────────────────────────
   const acceptBtn = el('button', 'btn-teal');
@@ -89,5 +111,7 @@ registerScreen('request-detail', () => {
 
   content.append(header, roleSection, vitalsSection, itemsSection, acceptBtn, backBtn);
   screen.append(makeTopBar(), content, makeBottomNav());
+
+  screen._onActivate = refresh;
   return screen;
 });

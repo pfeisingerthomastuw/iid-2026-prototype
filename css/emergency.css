@@ -1,5 +1,11 @@
 /* ── Emergency page header (screens 2 & 3) ── */
 .emerg-page-header { padding: 16px 14px 0; flex-shrink: 0; }
+.aff-back-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: 'Barlow', sans-serif; font-size: 13px; font-weight: 600;
+  color: rgba(255,255,255,0.75); padding: 0; letter-spacing: .2px;
+}
+.aff-back-btn:active { opacity: .6; }
 .emerg-tag         { font-size: 10.5px; font-weight: 700; letter-spacing: 2.5px; color: var(--red); margin-bottom: 5px; }
 .emerg-tag.teal    { color: var(--teal); }
 .emerg-bar         { height: 3px; background: var(--red); border-radius: 2px; }

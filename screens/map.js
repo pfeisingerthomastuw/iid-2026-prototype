@@ -70,10 +70,18 @@ registerScreen('map', () => {
           attributionControl: false,
         });
 
-        L.tileLayer(
+        const tileLayer = L.tileLayer(
           'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
           { maxZoom: 20 }
         ).addTo(map);
+
+        // Fix #9 — show banner if tiles fail to load
+        tileLayer.on('tileerror', () => {
+          if (!screen.querySelector('.error-banner')) {
+            const banner = showErrorBanner('No internet — map tiles unavailable.');
+            screen.insertBefore(banner, mapDiv);
+          }
+        });
 
         marker = L.marker(COORDS, { icon: locIcon }).addTo(map);
 

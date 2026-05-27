@@ -73,12 +73,6 @@ function makeBottomNav(active = 'alarm') {
         <span class="nav-label" style="color:${c}">${tab.label}</span>`;
       item.addEventListener('click', () => goTo('help-map'));
 
-    } else {
-      const c = isOn ? onColor : offColor;
-      item.innerHTML = `
-        ${ICON.info(c)}
-        <span class="nav-label" style="color:${c}">${tab.label}</span>`;
-      item.addEventListener('click', () => goTo('firstaid'));
     }
 
     nav.appendChild(item);
@@ -91,11 +85,13 @@ function showNotificationBanner() {
   document.querySelectorAll('.notif-banner').forEach(b => b.remove());
 
   const banner = el('div', 'notif-banner');
+  const v = DATA.incident;
+  const isCrit = v.victim.status === 'critical';
   banner.innerHTML = `
     <div class="notif-app-icon">CHEN</div>
     <div class="notif-body">
-      <div class="notif-title">Heat Emergency Nearby</div>
-      <div class="notif-sub">Carl M. · Critical · ~80 m away — tap to respond</div>
+      <div class="notif-title">${isCrit ? 'Heat Emergency Nearby' : 'Heat Stress Case Nearby'}</div>
+      <div class="notif-sub">${v.victim.name} · ${v.victim.status} · ${v.distance} away — tap to respond</div>
     </div>
     <button class="notif-dismiss" aria-label="Dismiss">✕</button>
   `;
@@ -189,6 +185,58 @@ function showCancelDialog(onConfirm) {
   dialog.append(title, body, keepBtn, confirmBtn);
   backdrop.appendChild(dialog);
   document.getElementById('app').appendChild(backdrop);
+}
+
+// ── Generic confirm dialog (Fix #5) ─────────────────────────
+function showConfirmDialog({ title, body, confirmLabel = 'Confirm', cancelLabel = '← Go Back', confirmClass = 'btn-teal', onConfirm }) {
+  const backdrop = el('div', 'dialog-backdrop');
+  const dialog   = el('div', 'dialog');
+
+  const titleEl = el('div', 'dialog-title');
+  titleEl.textContent = title;
+
+  const bodyEl = el('p', 'dialog-body');
+  bodyEl.textContent = body;
+
+  const confirmBtn = el('button', confirmClass);
+  confirmBtn.textContent = confirmLabel;
+
+  const cancelBtn = el('button', 'btn-outline');
+  cancelBtn.textContent = cancelLabel;
+  cancelBtn.style.marginTop = '0';
+
+  function close() { backdrop.remove(); }
+  confirmBtn.addEventListener('click', () => { close(); onConfirm(); });
+  cancelBtn.addEventListener('click', close);
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) close(); });
+
+  dialog.append(titleEl, bodyEl, confirmBtn, cancelBtn);
+  backdrop.appendChild(dialog);
+  document.getElementById('app').appendChild(backdrop);
+}
+
+// ── Error banner (Fix #9) ────────────────────────────────────
+// type: 'warning' (default amber) | 'red'
+function showErrorBanner(message, type = 'warning', container) {
+  const target = container || document.getElementById('app');
+  target.querySelectorAll('.error-banner').forEach(b => b.remove());
+
+  const banner = el('div', `error-banner${type === 'red' ? ' red' : ''}`);
+  banner.innerHTML = `
+    <span class="error-banner-icon">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0
+          1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9"  x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+    </span>
+    <span class="error-banner-text">${message}</span>
+    <button class="error-banner-dismiss" aria-label="Dismiss">✕</button>
+  `;
+  banner.querySelector('.error-banner-dismiss').addEventListener('click', () => banner.remove());
+  return banner;
 }
 
 // ── "REPORT EMERGENCY" label + colored bar ───────────────────

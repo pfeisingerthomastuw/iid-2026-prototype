@@ -91,9 +91,12 @@ registerScreen('home', () => {
       </svg>
     </div>
 
-    <!-- Demo: trigger incoming alert -->
-    <div class="demo-trigger" id="demoTrigger">
-      ⚡ Demo: Simulate incoming alert
+    <!-- Demo triggers -->
+    <div class="demo-trigger demo-trigger--critical" id="demoTrigger1">
+      ⚡ Demo A — Critical: Carl M.
+    </div>
+    <div class="demo-trigger demo-trigger--moderate" id="demoTrigger2">
+      ⚡ Demo B — Moderate: Stefan W.
     </div>
 
     <!-- Health Condition -->
@@ -155,14 +158,21 @@ registerScreen('home', () => {
   // Health detail sheet
   screen.querySelector('#healthInfoBtn').addEventListener('click', () => showHealthSheet());
 
-  // Demo trigger for incoming alert
-  screen.querySelector('#demoTrigger').addEventListener('click', showNotificationBanner);
+  screen.querySelector('#demoTrigger1').addEventListener('click', () => {
+    DATA.incident = DATA.incidents[0];
+    showNotificationBanner();
+  });
+  screen.querySelector('#demoTrigger2').addEventListener('click', () => {
+    DATA.incident = DATA.incidents[1];
+    showNotificationBanner();
+  });
 
-  // Auto-show notification once on first activation
+  // Auto-show critical demo once on first activation
   let notifShown = false;
   screen._onActivate = () => {
     if (!notifShown) {
       notifShown = true;
+      DATA.incident = DATA.incidents[0];
       setTimeout(showNotificationBanner, 2000);
     }
   };

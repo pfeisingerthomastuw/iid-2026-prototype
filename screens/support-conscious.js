@@ -10,9 +10,14 @@ registerScreen('support-conscious', () => {
   const hero = el('div', 'support-hero');
   hero.innerHTML = `
     <div class="support-hero-tag">On-Site Support</div>
-    <div class="support-hero-title">${DATA.incident.victim.name} is conscious</div>
+    <div class="support-hero-title" id="scHeroTitle">… is conscious</div>
     <div class="support-hero-sub">Responsive — follow steps below</div>
+    <button class="support-skip-btn">Skip — I know what to do →</button>
   `;
+  hero.querySelector('.support-skip-btn').addEventListener('click', () => {
+    DATA.session = { startTime: Date.now(), path: 'conscious', checksCompleted: 0, total: checks.length };
+    goTo('resolve');
+  });
 
   const content = el('div', 'support-content');
 
@@ -24,8 +29,8 @@ registerScreen('support-conscious', () => {
   `;
 
   // ── Live vitals ───────────────────────────
-  let bpm  = 168;
-  let temp = 39.2;
+  let bpm  = 100;
+  let temp = 38.0;
 
   const vitalsCard = el('div', 'support-vitals-card');
   vitalsCard.innerHTML = `
@@ -33,12 +38,12 @@ registerScreen('support-conscious', () => {
     <div class="support-vitals-grid">
       <div class="support-vital-item">
         <div class="support-vital-label">Heart Rate</div>
-        <div class="support-vital-value critical" id="scBpm">168 BPM</div>
+        <div class="support-vital-value critical" id="scBpm">— BPM</div>
         <div class="support-vital-trend critical" id="scBpmTrend">▲ Critically elevated</div>
       </div>
       <div class="support-vital-item">
         <div class="support-vital-label">Body Temp</div>
-        <div class="support-vital-value critical" id="scTemp">39.2 °C</div>
+        <div class="support-vital-value critical" id="scTemp">— °C</div>
         <div class="support-vital-trend critical" id="scTempTrend">▲ Dangerously high</div>
       </div>
     </div>
@@ -131,6 +136,10 @@ registerScreen('support-conscious', () => {
   let vitalsInterval = null;
 
   screen._onActivate = () => {
+    // Update hero name
+    const heroTitle = document.getElementById('scHeroTitle');
+    if (heroTitle) heroTitle.textContent = `${DATA.incident.victim.name} is conscious`;
+
     startTs = Date.now();
 
     clearInterval(timerInterval);
@@ -141,9 +150,18 @@ registerScreen('support-conscious', () => {
       if (node) node.textContent = `${m}:${s.toString().padStart(2, '0')}`;
     }, 1000);
 
+    // Seed initial vitals from current incident data
+    const bpmVital  = DATA.incident.vitals.find(vt => vt.label === 'Heart Rate');
+    const tempVital = DATA.incident.vitals.find(vt => vt.label === 'Body Temperature');
+    bpm  = bpmVital  ? parseFloat(bpmVital.value)  : 100;
+    temp = tempVital ? parseFloat(tempVital.value) : 38.0;
+
+    const bpmEl    = document.getElementById('scBpm');
+    const tempEl   = document.getElementById('scTemp');
+    if (bpmEl)  bpmEl.textContent  = `${Math.round(bpm)} BPM`;
+    if (tempEl) tempEl.textContent = `${temp.toFixed(1)} °C`;
+
     // Vitals slowly improve as responder takes action
-    bpm  = 168;
-    temp = 39.2;
     clearInterval(vitalsInterval);
     vitalsInterval = setInterval(() => {
       bpm  = Math.max(98,  bpm  - (Math.random() * 5 + 2));

@@ -9,6 +9,15 @@
   display: flex; flex-direction: column; gap: 12px;
 }
 
+/* ── Skip link for experienced responders (Fix #7) ── */
+.support-skip-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: 'Barlow', sans-serif; font-size: 11.5px; font-weight: 600;
+  color: rgba(255,255,255,0.55); letter-spacing: .3px; margin-top: 4px;
+  padding: 4px 0; text-decoration: underline; text-underline-offset: 3px;
+}
+.support-skip-btn:active { opacity: .6; }
+
 /* ── Teal support hero (conscious path) ── */
 .support-hero {
   width: 100%; flex-shrink: 0;
