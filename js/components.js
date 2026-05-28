@@ -31,6 +31,9 @@ function makeTopBar() {
     </div>
     <div class="topbar-avatar">${ICON.person('#777')}</div>
   `;
+  bar.querySelector('.topbar-logo').addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
   return bar;
 }
 
@@ -237,6 +240,113 @@ function showErrorBanner(message, type = 'warning', container) {
   `;
   banner.querySelector('.error-banner-dismiss').addEventListener('click', () => banner.remove());
   return banner;
+}
+
+// ── Coordination bottom sheet (shared) ──────────────────────
+function showCoordinationSheet() {
+  const backdrop = el('div', 'health-backdrop');
+  const sheet    = el('div', 'health-sheet');
+  const handle   = el('div', 'sheet-handle');
+
+  const title = el('div', 'rd-section-title');
+  title.style.cssText = 'padding: 0 16px 12px; display:block;';
+  title.textContent = 'Team on-site';
+
+  sheet.append(handle, title);
+
+  const avatarColors = ['teal', 'grey'];
+  DATA.incident.responders.forEach((r, i) => {
+    const item        = el('div', 'coord-sheet-item');
+    const avatarColor = avatarColors[i] ?? 'grey';
+    const statusClass = r.status === 'arrived' ? 'arrived' : 'en-route';
+    const statusLabel = r.status === 'arrived' ? 'Arrived'  : 'En Route';
+    item.innerHTML = `
+      <div class="coord-avatar-large ${avatarColor}">${r.initials}</div>
+      <div style="flex:1">
+        <div class="coord-name">${r.name}</div>
+        <div class="coord-role">${r.role}</div>
+        ${r.task ? `
+        <div class="coord-task">
+          <span class="coord-task-dot ${statusClass}"></span>
+          ${r.task}
+        </div>` : ''}
+      </div>
+      <div class="coord-status-badge ${statusClass}">${statusLabel}</div>
+    `;
+    sheet.appendChild(item);
+  });
+
+  const youItem = el('div', 'coord-sheet-item');
+  youItem.innerHTML = `
+    <div class="coord-avatar-large" style="background:#4285F4">YOU</div>
+    <div style="flex:1">
+      <div class="coord-name">You</div>
+      <div class="coord-role">${DATA.incident.role}</div>
+      <div class="coord-task">
+        <span class="coord-task-dot arrived"></span>
+        Following support protocol
+      </div>
+    </div>
+    <div class="coord-status-badge arrived">Arrived</div>
+  `;
+  sheet.appendChild(youItem);
+
+  backdrop.appendChild(sheet);
+  document.getElementById('app').appendChild(backdrop);
+
+  sheet.style.transform = 'translateY(100%)';
+  requestAnimationFrame(() => {
+    sheet.style.transition = 'transform .28s cubic-bezier(.32,1,.6,1)';
+    sheet.style.transform  = 'translateY(0)';
+  });
+
+  function dismiss() {
+    sheet.style.transition = 'transform .25s ease-in';
+    sheet.style.transform  = 'translateY(100%)';
+    backdrop.style.transition = 'opacity .25s';
+    backdrop.style.opacity = '0';
+    setTimeout(() => backdrop.remove(), 260);
+  }
+
+  backdrop.addEventListener('click', e => { if (e.target === backdrop) dismiss(); });
+
+  let startY = 0, dragY = 0, dragging = false;
+
+  function onDragStart(e) {
+    dragging = true;
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    sheet.style.transition = 'none';
+  }
+  function onDragMove(e) {
+    if (!dragging) return;
+    const y = e.touches ? e.touches[0].clientY : e.clientY;
+    dragY = Math.max(0, y - startY);
+    sheet.style.transform = `translateY(${dragY}px)`;
+    backdrop.style.opacity = Math.max(0, 1 - dragY / 250);
+  }
+  function onDragEnd() {
+    if (!dragging) return;
+    dragging = false;
+    if (dragY > 100) {
+      dismiss();
+    } else {
+      sheet.style.transition = 'transform .25s cubic-bezier(.32,1,.6,1)';
+      sheet.style.transform  = 'translateY(0)';
+      backdrop.style.opacity = '1';
+    }
+    dragY = 0;
+    window.removeEventListener('mousemove', onDragMove);
+    window.removeEventListener('mouseup',   onDragEnd);
+  }
+
+  sheet.addEventListener('touchstart', onDragStart, { passive: true });
+  sheet.addEventListener('touchmove',  onDragMove,  { passive: true });
+  sheet.addEventListener('touchend',   onDragEnd);
+  sheet.addEventListener('mousedown',  e => {
+    onDragStart(e);
+    window.addEventListener('mousemove', onDragMove);
+    window.addEventListener('mouseup',   onDragEnd);
+  });
 }
 
 // ── "REPORT EMERGENCY" label + colored bar ───────────────────

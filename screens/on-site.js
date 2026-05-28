@@ -11,8 +11,19 @@ registerScreen('on-site', () => {
   const question = el('div', 'onsite-question');
   question.textContent = 'Is the worker conscious?';
 
-  const sub = el('div', 'onsite-sub');
-  sub.textContent = 'Tap the person on the shoulder and call their name loudly.';
+  const guide = el('div', 'onsite-check-guide');
+  guide.innerHTML = `
+    <div class="onsite-check-guide-title">How to check</div>
+    <div class="onsite-check-step">
+      <div class="onsite-check-num">1</div>
+      <span>Tap their shoulder firmly</span>
+    </div>
+    <div class="onsite-check-step">
+      <div class="onsite-check-num">2</div>
+      <span>Call their name loudly</span>
+    </div>
+    <div class="onsite-check-threshold">No reaction to either → unconscious</div>
+  `;
 
   const yesCard = el('div', 'onsite-card teal');
   yesCard.innerHTML = `
@@ -28,7 +39,7 @@ registerScreen('on-site', () => {
   `;
   noCard.addEventListener('click', () => goTo('support-unconscious'));
 
-  content.append(question, sub, yesCard, noCard);
+  content.append(question, guide, yesCard, noCard);
   screen.append(makeTopBar(), makeEmergHeader(true), content, makeBottomNav());
   return screen;
 });

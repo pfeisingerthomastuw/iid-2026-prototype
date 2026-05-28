@@ -89,10 +89,22 @@ window.addEventListener('popstate', e => {
   goTo(id, id === 'home' ? 'back' : 'forward', true);
 });
 
-// Seed initial history entry — honour ?start= param (e.g. from alert.html)
-const startScreen = new URLSearchParams(location.search).get('start') ?? 'home';
-history.replaceState({ screenId: startScreen }, '');
-goTo(startScreen, 'forward', true);
+// Seed initial history entry
+const params = new URLSearchParams(location.search);
+history.replaceState({ screenId: 'home' }, '');
+goTo('home', 'forward', true);
+
+// Scenario: show notification banner after a short delay
+if (params.get('start') === 'incoming') {
+  const idx = parseInt(params.get('incident') ?? '0', 10);
+  DATA.incident = DATA.incidents[idx] ?? DATA.incidents[0];
+  setTimeout(showNotificationBanner, 2000);
+}
+
+// Victim autotrigger: redirect to alert.html after 5 s
+if (params.get('autotrigger') === 'victim') {
+  setTimeout(() => { window.location.href = 'alert.html'; }, 5000);
+}
 </script>
 </body>
 </html>

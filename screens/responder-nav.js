@@ -20,7 +20,19 @@ registerScreen('responder-nav', () => {
   // ── Arrived button ────────────────────────
   const arrivedBtn = el('button', 'rnav-arrived-btn');
   arrivedBtn.textContent = "I've arrived ✓";
-  arrivedBtn.addEventListener('click', () => goTo('on-site'));
+  arrivedBtn.addEventListener('click', () => {
+    const alreadyOnSite = DATA.incident.responders.find(r => r.status === 'arrived');
+    if (alreadyOnSite) {
+      const target = DATA.incident.victimConscious ? 'support-conscious' : 'support-unconscious';
+      showToast(
+        `${alreadyOnSite.name} is already with the patient`,
+        'Assessment skipped — joining support'
+      );
+      goTo(target);
+    } else {
+      goTo('on-site');
+    }
+  });
 
   screen.append(makeTopBar(), mapDiv, topCard, coordStrip, arrivedBtn, makeBottomNav('help'));
 
@@ -79,9 +91,12 @@ registerScreen('responder-nav', () => {
     const avatarHTML = v.responders.map((r, i) =>
       `<div class="rnav-avatar ${avatarColors[i] ?? 'red'}">${r.initials}</div>`
     ).join('');
+    const coordText = v.responders.length === 0
+      ? 'You are the only responder'
+      : `${v.responders.length} other${v.responders.length > 1 ? 's' : ''} also responding`;
     coordStrip.innerHTML = `
       <div class="rnav-coord-avatars">${avatarHTML}</div>
-      <div class="rnav-coord-text">${v.responders.length} others also responding</div>
+      <div class="rnav-coord-text">${coordText}</div>
       <div class="rnav-coord-arrow">›</div>
     `;
   }

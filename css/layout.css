@@ -3,9 +3,10 @@
   height: var(--top-h); flex-shrink: 0;
   background: var(--card);
   display: flex; align-items: center; padding: 0 18px;
-  border-bottom: 1px solid var(--border); z-index: 10;
+  border-bottom: 1px solid var(--border);
+  position: relative; z-index: 20;
 }
-.topbar-logo { font-weight: 900; font-size: 23px; color: var(--red); letter-spacing: 3px; flex: 1; }
+.topbar-logo { font-weight: 900; font-size: 23px; color: var(--red); letter-spacing: 3px; flex: 1; cursor: pointer; }
 .topbar-gps  {
   display: flex; align-items: center; gap: 5px;
   font-size: 10.5px; font-weight: 600; color: var(--text-muted);

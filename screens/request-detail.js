@@ -28,6 +28,10 @@ registerScreen('request-detail', () => {
     const v = DATA.incident;
 
     // Role
+    const reasonsHtml = (v.roleReasons || []).map(r => `
+      <span class="rd-role-reason">✓ ${r}</span>
+    `).join('');
+
     roleSection.innerHTML = `
       <div class="rd-role-badge">
         <div class="rd-role-icon">
@@ -39,9 +43,10 @@ registerScreen('request-detail', () => {
             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
           </svg>
         </div>
-        <div>
+        <div style="flex:1">
           <div class="rd-role-name">${v.role}</div>
           <div class="rd-role-desc">${v.roleDesc}</div>
+          ${reasonsHtml ? `<div class="rd-role-reasons">${reasonsHtml}</div>` : ''}
         </div>
       </div>
     `;

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CHEN — Scenario Selector</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #F5F5F5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 60px;
+    }
+    h1 {
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: #D32F2F;
+      margin-bottom: 4px;
+    }
+    .subtitle {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 40px;
+      letter-spacing: 1px;
+    }
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #AAAAAA;
+      align-self: flex-start;
+      margin-bottom: 8px;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    /* ── Shared eval-card shell ── */
+    .eval-card {
+      width: 100%; max-width: 400px;
+      background: white;
+      border: 1.5px solid #E5E5E5;
+      border-radius: 14px;
+      padding: 0;
+      margin-bottom: 10px;
+      text-decoration: none;
+      display: block;
+      transition: box-shadow .12s, border-color .12s;
+      overflow: hidden;
+    }
+    .eval-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); border-color: #CCC; }
+    .eval-card:active { background: #FAFAFA; }
+
+    .eval-card-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 18px 12px;
+      cursor: pointer;
+    }
+    .card-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .card-icon.red    { background: #FFEBEE; }
+    .card-icon.teal   { background: #E0F4F5; }
+    .card-icon.blue   { background: #E3F2FD; }
+    .card-icon.amber  { background: #FFFBEB; }
+    .card-icon.green  { background: #E8F5E9; }
+    .card-icon.purple { background: #F3E5F5; }
+    .card-title { font-size: 14px; font-weight: 700; color: #1A1A1A; }
+    .card-sub   { font-size: 11.5px; color: #888; margin-top: 2px; }
+    .card-arrow { margin-left: auto; color: #CCC; font-size: 18px; flex-shrink: 0; }
+
+    .eval-goal-tag {
+      display: inline-block;
+      font-size: 9px; font-weight: 800; letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border-radius: 20px;
+      padding: 2px 8px; margin-bottom: 4px;
+    }
+    .eval-goal-tag.teal   { color: #00838F; background: #E0F4F5; }
+    .eval-goal-tag.red    { color: #B71C1C; background: #FFEBEE; }
+    .eval-goal-tag.amber  { color: #7B4F00; background: #FFFBEB; }
+    .eval-goal-tag.blue   { color: #1565C0; background: #E3F2FD; }
+    .eval-goal-tag.green  { color: #1B5E20; background: #E8F5E9; }
+    .eval-goal-tag.purple { color: #6A1B9A; background: #F3E5F5; }
+    .eval-goal-tag.grey   { color: #555;    background: #F0F0F0; }
+
+    .eval-task-box {
+      margin: 0 14px 14px;
+      background: #F9F9F9; border-radius: 10px;
+      border-left: 3px solid #E0E0E0;
+      padding: 10px 12px;
+    }
+    .eval-task-label {
+      font-size: 9px; font-weight: 800; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #AAAAAA; margin-bottom: 5px;
+    }
+    .eval-task-text {
+      font-size: 12px; color: #555; line-height: 1.55;
+    }
+    .eval-observe-label {
+      font-size: 9px; font-weight: 800; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #AAAAAA;
+      margin-top: 8px; margin-bottom: 4px;
+    }
+    .eval-observe-item {
+      font-size: 11.5px; color: #777; line-height: 1.5;
+      padding-left: 2px;
+    }
+
+    .eval-steps {
+      display: flex; flex-direction: column; gap: 6px;
+      margin: 0 14px 14px;
+    }
+    .eval-step {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: #F9F9F9; border-radius: 9px;
+      padding: 9px 11px;
+    }
+    .eval-step-num {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #E0E0E0; color: #666;
+      font-size: 9px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .eval-step-text { font-size: 12px; color: #555; line-height: 1.45; }
+    .eval-step-sub  { font-size: 11px; color: #999; margin-top: 2px; }
+
+    .eval-divider {
+      height: 1px; background: #F0F0F0;
+      margin: 0 14px 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>CHEN</h1>
+  <div class="subtitle">SCENARIO SELECTOR</div>
+
+  <!-- ══════════════════════════════════════
+       STUDY SCENARIOS
+  ══════════════════════════════════════ -->
+  <div class="section-label">Study Scenarios</div>
+
+  <a class="eval-card" href="homescreen.html?start=incoming&incident=2">
+    <div class="eval-card-header">
+      <div class="card-icon red">🧍</div>
+      <div>
+        <div class="eval-goal-tag red">Solo Responder · Full Assessment</div>
+        <div class="card-title">Scenario — Solo Response</div>
+        <div class="card-sub">Lena S. · Critical · No other responders</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </div>
+    <div class="eval-task-box">
+      <div class="eval-task-label">Task for participant</div>
+      <div class="eval-task-text">
+        You received an alert — you are the only person available to help. Make your way to the scene, assess the worker's condition, follow the support steps, and decide how to close the incident.
+      </div>
+      <div class="eval-observe-label">Flow covers</div>
+      <div class="eval-observe-item">— Full flow with no other responders present</div>
+      <div class="eval-observe-item">— On-site consciousness assessment (user decides)</div>
+      <div class="eval-observe-item">— Conscious or unconscious support checklist</div>
+      <div class="eval-observe-item">— Resolution choice: stable / handover / escalate</div>
+    </div>
+  </a>
+
+  <a class="eval-card" href="homescreen.html?start=incoming">
+    <div class="eval-card-header">
+      <div class="card-icon teal">🤝</div>
+      <div>
+        <div class="eval-goal-tag teal">Goal 3 — Coordination</div>
+        <div class="card-title">Scenario — Community Response</div>
+        <div class="card-sub">Carl M. · Critical · 2 other responders</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </div>
+    <div class="eval-task-box">
+      <div class="eval-task-label">Task for participant</div>
+      <div class="eval-task-text">
+        You just received an emergency alert. Accept it, make your way to the scene, and help the affected worker. At any point, try to find out who else is responding and what they are doing.
+      </div>
+      <div class="eval-observe-label">Observe whether participant can identify</div>
+      <div class="eval-observe-item">— Who else has accepted the request</div>
+      <div class="eval-observe-item">— What role each person was assigned and why</div>
+      <div class="eval-observe-item">— What each responder is actively doing on-site</div>
+    </div>
+  </a>
+
+  <!-- ══════════════════════════════════════
+       PHONE — RESPONDER
+  ══════════════════════════════════════ -->
+  <div class="section-label" style="margin-top:24px">Phone — Responder</div>
+
+  <a class="eval-card" href="homescreen.html?start=incoming">
+    <div class="eval-card-header">
+      <div class="card-icon red">🚨</div>
+      <div>
+        <div class="eval-goal-tag red">Responder · Full Flow</div>
+        <div class="card-title">Scenario — Help Notification</div>
+        <div class="card-sub">Carl M. · Critical · Starts at home screen</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </div>
+    <div class="eval-task-box">
+      <div class="eval-task-label">What happens</div>
+      <div class="eval-task-text">
+        Opens the home screen. After 2 seconds a notification banner drops in — an emergency alert for Carl M. nearby. Tapping it starts the full responder flow: accept → navigate → arrive → support.
+      </div>
+      <div class="eval-observe-label">Flow covers</div>
+      <div class="eval-observe-item">— Incoming alert &amp; role assignment screen</div>
+      <div class="eval-observe-item">— Navigation map with ETA to victim</div>
+      <div class="eval-observe-item">— On-site consciousness assessment</div>
+      <div class="eval-observe-item">— Conscious support checklist with live vitals</div>
+    </div>
+  </a>
+
+  <a class="eval-card" href="homescreen.html">
+    <div class="eval-card-header">
+      <div class="card-icon teal">🏠</div>
+      <div>
+        <div class="eval-goal-tag teal">Responder · Free Explore</div>
+        <div class="card-title">Scenario — Free Exploration</div>
+        <div class="card-sub">Full app, no autotrigger — explore freely</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </div>
+    <div class="eval-task-box">
+      <div class="eval-task-label">What happens</div>
+      <div class="eval-task-text">
+        Lands on the home screen with weather, heatstress ring, and health card. No alert fires automatically — use the bottom nav and cards to explore the app at your own pace.
+      </div>
+      <div class="eval-observe-label">Good for testing</div>
+      <div class="eval-observe-item">— Home screen legibility and layout</div>
+      <div class="eval-observe-item">— Health detail sheet (tap ⓘ)</div>
+      <div class="eval-observe-item">— Hold-to-send mis-tap protection</div>
+      <div class="eval-observe-item">— Help map (bottom nav → Help)</div>
+    </div>
+  </a>
+
+  <!-- ══════════════════════════════════════
+       PHONE — VICTIM
+  ══════════════════════════════════════ -->
+  <div class="section-label" style="margin-top:24px">Phone — Victim</div>
+
+  <a class="eval-card" href="homescreen.html?autotrigger=victim">
+    <div class="eval-card-header">
+      <div class="card-icon blue">🆘</div>
+      <div>
+        <div class="eval-goal-tag blue">Victim · Self-Report</div>
+        <div class="card-title">Scenario — Victim Sends SOS</div>
+        <div class="card-sub">Starts at home · redirects to SOS screen after 5 s</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </div>
+    <div class="eval-task-box">
+      <div class="eval-task-label">What happens</div>
+      <div class="eval-task-text">
+        Opens the home screen for 5 seconds, then navigates to the victim-side SOS report screen — simulating a worker manually triggering an emergency for themselves.
+      </div>
+      <div class="eval-observe-label">Flow covers</div>
+      <div class="eval-observe-item">— Manual SOS trigger with hold-to-send</div>
+      <div class="eval-observe-item">— "Who is affected?" selection (self or other)</div>
+      <div class="eval-observe-item">— Emergency reported confirmation with symptom checklist</div>
+    </div>
+  </a>
+
+  <!-- ══════════════════════════════════════
+       WATCH
+  ══════════════════════════════════════ -->
+  <div class="section-label" style="margin-top:24px">Watch</div>
+
+  <a class="eval-card" href="watch.html?freeroam=true">
+    <div class="eval-card-header">
+      <div class="card-icon teal">⌚</div>
+      <div>
+        <div class="eval-goal-tag teal">Watch · Free Explore</div>
+        <div class="card-title">Scenario — Watch Free Exploration</div>
+        <div class="card-sub">Watch face only — no autotrigger</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </div>
+    <div class="eval-task-box">
+      <div class="eval-task-label">What happens</div>
+      <div class="eval-task-text">
+        Opens the watch face with no automatic triggers. Explore the watch UI freely — tap the SOS button to manually start an emergency.
+      </div>
+      <div class="eval-observe-label">Good for testing</div>
+      <div class="eval-observe-item">— Watch face layout and health status display</div>
+      <div class="eval-observe-item">— Manual SOS hold-to-send interaction</div>
+      <div class="eval-observe-item">— Incoming alert and acceptance flow</div>
+    </div>
+  </a>
+
+  <a class="eval-card" href="watch.html">
+    <div class="eval-card-header">
+      <div class="card-icon amber">⌚</div>
+      <div>
+        <div class="eval-goal-tag amber">Watch · Responder Alert</div>
+        <div class="card-title">Scenario — Watch Help Notification</div>
+        <div class="card-sub">Watch face · alert slides in after 3 s</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </div>
+    <div class="eval-task-box">
+      <div class="eval-task-label">What happens</div>
+      <div class="eval-task-text">
+        Shows the watch face, then after 3 seconds an incoming alert slides in for a nearby victim. Demonstrates how a responder is notified and can accept directly from the watch.
+      </div>
+      <div class="eval-observe-label">Flow covers</div>
+      <div class="eval-observe-item">— Watch idle face with rising heatstress risk</div>
+      <div class="eval-observe-item">— Incoming alert notification on watch</div>
+      <div class="eval-observe-item">— Confirmation screen after accepting</div>
+    </div>
+  </a>
+
+  <a class="eval-card" href="watch.html?autotrigger=watch">
+    <div class="eval-card-header">
+      <div class="card-icon red">⏱️</div>
+      <div>
+        <div class="eval-goal-tag red">Watch · Victim SOS</div>
+        <div class="card-title">Scenario — Watch Automatic SOS</div>
+        <div class="card-sub">5 s on face → 30 s countdown → auto-sends SOS</div>
+      </div>
+      <div class="card-arrow">›</div>
+    </div>
+    <div class="eval-task-box">
+      <div class="eval-task-label">What happens</div>
+      <div class="eval-task-text">
+        Starts on the watch face for 5 seconds, then automatically triggers the SOS countdown — simulating a biometric threshold being exceeded. The 30-second timer runs with a vibration animation; cancel is available throughout.
+      </div>
+      <div class="eval-observe-label">Flow covers</div>
+      <div class="eval-observe-item">— Automatic health-threshold detection</div>
+      <div class="eval-observe-item">— 30 s grace period with cancel option</div>
+      <div class="eval-observe-item">— Auto-send confirmation screen</div>
+    </div>
+  </a>
+
+</body>
+</html>

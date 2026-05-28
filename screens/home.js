@@ -67,15 +67,18 @@ registerScreen('home', () => {
     </div>
 
     <!-- Heatstress Risk -->
-    <div class="card heat-card">
-      <div class="heat-label">Heatstress<br>Risk</div>
-      <div class="ring-wrap">
+    <div class="card heat-card" id="heatCard">
+      <div>
+        <div class="heat-label">Heatstress<br>Risk</div>
+        <div class="heat-sublabel" id="heatLabel">Low</div>
+      </div>
+      <div class="ring-wrap" id="ringWrap">
         <svg width="70" height="70" viewBox="0 0 64 64">
           <circle class="ring-bg"   cx="32" cy="32" r="28"/>
-          <circle class="ring-fill" cx="32" cy="32" r="28"
+          <circle class="ring-fill" id="ringFill" cx="32" cy="32" r="28"
             style="stroke-dashoffset:${offset}"/>
         </svg>
-        <div class="ring-pct">${pct}%</div>
+        <div class="ring-pct" id="ringPct">—</div>
       </div>
     </div>
 
@@ -89,14 +92,7 @@ registerScreen('home', () => {
         <circle class="hold-fill"  cx="50" cy="50" r="45"
           id="holdFill" transform="rotate(-90 50 50)"/>
       </svg>
-    </div>
-
-    <!-- Demo triggers -->
-    <div class="demo-trigger demo-trigger--critical" id="demoTrigger1">
-      ⚡ Demo A — Critical: Carl M.
-    </div>
-    <div class="demo-trigger demo-trigger--moderate" id="demoTrigger2">
-      ⚡ Demo B — Moderate: Stefan W.
+      <div class="hold-nudge" id="holdNudge">Hold until complete</div>
     </div>
 
     <!-- Health Condition -->
@@ -121,13 +117,17 @@ registerScreen('home', () => {
   const card  = screen.querySelector('#emergCard');
   const ring  = screen.querySelector('#holdRing');
   const fill  = screen.querySelector('#holdFill');
+  const nudge = screen.querySelector('#holdNudge');
   const CIRC  = 283;
   const HOLD  = 2000; // ms to hold before triggering
   let   raf   = null;
   let   t0    = null;
+  let   nudgeTimer = null;
 
   function startHold(e) {
     e.preventDefault();
+    clearTimeout(nudgeTimer);
+    nudge.classList.remove('visible');
     endHold();
     t0 = performance.now();
     ring.style.opacity = '1';
@@ -141,11 +141,22 @@ registerScreen('home', () => {
     else        { endHold(); goTo('affected'); }
   }
   function endHold() {
+    const wasHolding = t0 !== null;
+    const progress   = wasHolding ? (performance.now() - t0) / HOLD : 0;
+
     if (raf) cancelAnimationFrame(raf);
     raf = null; t0 = null;
     card.classList.remove('holding');
     ring.style.opacity = '0';
     fill.style.strokeDashoffset = CIRC;
+
+    // Only fire feedback if released early (not a clean completion or fresh tap)
+    if (wasHolding && progress < 1 && progress > 0.05) {
+      card.classList.add('shake');
+      card.addEventListener('animationend', () => card.classList.remove('shake'), { once: true });
+      nudge.classList.add('visible');
+      nudgeTimer = setTimeout(() => nudge.classList.remove('visible'), 1500);
+    }
   }
 
   card.addEventListener('mousedown',   startHold);
@@ -158,23 +169,82 @@ registerScreen('home', () => {
   // Health detail sheet
   screen.querySelector('#healthInfoBtn').addEventListener('click', () => showHealthSheet());
 
-  screen.querySelector('#demoTrigger1').addEventListener('click', () => {
-    DATA.incident = DATA.incidents[0];
-    showNotificationBanner();
-  });
-  screen.querySelector('#demoTrigger2').addEventListener('click', () => {
-    DATA.incident = DATA.incidents[1];
-    showNotificationBanner();
-  });
+  // Heatstress risk animation
+  const CIRC_HEAT = 175.9;
+  const heatSteps = [
+    {
+      pct: 62, label: 'MODERATE', warning: false,
+      cardBg: '#FFFDF5', cardBorder: '#F59E0B',
+      ringColor: '#F59E0B', labelColor: '#B45309',
+      pulse: 'pulse-amber', throb: false,
+    },
+    {
+      pct: 79, label: 'HIGH', warning: false,
+      cardBg: '#FFF5F0', cardBorder: '#EF6C00',
+      ringColor: '#EF6C00', labelColor: '#BF360C',
+      pulse: 'pulse-orange', throb: false,
+    },
+    {
+      pct: 94, label: 'CRITICAL', warning: false,
+      cardBg: '#FFF0F0', cardBorder: '#D32F2F',
+      ringColor: '#D32F2F', labelColor: '#B71C1C',
+      pulse: 'pulse-red', throb: true,
+    },
+  ];
 
-  // Auto-show critical demo once on first activation
-  let notifShown = false;
+  function applyHeatStep(step) {
+    const heatCard   = document.getElementById('heatCard');
+    const ringWrap   = document.getElementById('ringWrap');
+    const ringFill   = document.getElementById('ringFill');
+    const ringPct    = document.getElementById('ringPct');
+    const heatLabel  = document.getElementById('heatLabel');
+    if (!heatCard) return;
+
+    heatCard.style.background  = step.cardBg;
+    heatCard.style.borderColor = step.cardBorder;
+    heatCard.classList.remove('pulse-amber', 'pulse-orange', 'pulse-red');
+    heatCard.classList.add(step.pulse);
+
+    ringFill.style.stroke           = step.ringColor;
+    ringFill.style.strokeDashoffset = CIRC_HEAT * (1 - step.pct / 100);
+    ringPct.style.color             = step.ringColor;
+    ringPct.textContent             = `${step.pct}%`;
+    ringWrap.classList.toggle('throb', step.throb);
+
+    heatLabel.style.color  = step.labelColor;
+    heatLabel.textContent  = step.label;
+  }
+
+  let heatStepIdx = 0;
+  let heatTimer   = null;
+
   screen._onActivate = () => {
-    if (!notifShown) {
-      notifShown = true;
-      DATA.incident = DATA.incidents[0];
-      setTimeout(showNotificationBanner, 2000);
+    heatStepIdx = 0;
+    const heatCard  = document.getElementById('heatCard');
+    const ringWrap  = document.getElementById('ringWrap');
+    const ringFill  = document.getElementById('ringFill');
+    const ringPct   = document.getElementById('ringPct');
+    const heatLabel = document.getElementById('heatLabel');
+    if (heatCard) {
+      heatCard.style.background  = '';
+      heatCard.style.borderColor = '#E5E5E5';
+      heatCard.classList.remove('pulse-amber', 'pulse-orange', 'pulse-red');
     }
+    if (ringWrap)  ringWrap.classList.remove('throb');
+    if (ringFill)  { ringFill.style.stroke = '#E5E5E5'; ringFill.style.strokeDashoffset = String(CIRC_HEAT); }
+    if (ringPct)   { ringPct.style.color = '#AAAAAA'; ringPct.textContent = '—'; }
+    if (heatLabel) { heatLabel.style.color = '#AAAAAA'; heatLabel.textContent = 'LOW'; }
+
+    clearTimeout(heatTimer);
+    function scheduleNext() {
+      if (heatStepIdx >= heatSteps.length) return;
+      heatTimer = setTimeout(() => {
+        applyHeatStep(heatSteps[heatStepIdx]);
+        heatStepIdx++;
+        scheduleNext();
+      }, heatStepIdx === 0 ? 2000 : 3000);
+    }
+    scheduleNext();
   };
 
   return screen;

@@ -51,11 +51,11 @@ registerScreen('support-conscious', () => {
 
   // ── Checklist ─────────────────────────────
   const checks = [
-    { label: 'Moved to shade or cool area',          sub: 'Away from direct sunlight and heat sources' },
-    { label: 'Loosened restrictive clothing',         sub: 'Removed helmet, unbuttoned collar and vest' },
-    { label: 'Applied cool wet cloths',               sub: 'To neck, armpits, and groin — most effective zones' },
-    { label: 'Provided small sips of cool water',     sub: 'Every few minutes; avoid alcohol or caffeine' },
-    { label: 'Monitoring breathing & responsiveness', sub: 'Checking every 2 minutes, person is staying awake' },
+    { icon: '☂️', label: 'Moved to shade or cool area',          sub: 'Away from direct sunlight and heat sources' },
+    { icon: '👕', label: 'Loosened restrictive clothing',         sub: 'Removed helmet, unbuttoned collar and vest' },
+    { icon: '🧊', label: 'Applied cool wet cloths',               sub: 'To neck, armpits, and groin — most effective zones' },
+    { icon: '💧', label: 'Provided small sips of cool water',     sub: 'Every few minutes; avoid alcohol or caffeine' },
+    { icon: '👁️', label: 'Monitoring breathing & responsiveness', sub: 'Checking every 2 minutes, person is staying awake' },
   ];
 
   const checklistCard = el('div', 'support-checklist-card');
@@ -67,6 +67,7 @@ registerScreen('support-conscious', () => {
   `;
 
   let doneCount = 0;
+  const checkItemEls = [];
 
   checks.forEach(c => {
     const item = el('div', 'support-check-item');
@@ -77,6 +78,7 @@ registerScreen('support-conscious', () => {
             stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
+      <div class="support-check-icon">${c.icon}</div>
       <div class="support-check-text">
         <div class="support-check-label">${c.label}</div>
         <div class="support-check-sub">${c.sub}</div>
@@ -89,13 +91,13 @@ registerScreen('support-conscious', () => {
       item.classList.add('done');
       mark.style.display = 'block';
       doneCount++;
-      const pct = (doneCount / checks.length) * 100;
       const bar = document.getElementById('scProgress');
-      if (bar) bar.style.width = `${pct}%`;
+      if (bar) bar.style.width = `${(doneCount / checks.length) * 100}%`;
       if (doneCount >= checks.length) resolveBtn.classList.add('resolve-ready');
     });
 
     checklistCard.appendChild(item);
+    checkItemEls.push(item);
   });
 
   // ── Call 144 button ───────────────────────
@@ -127,7 +129,11 @@ registerScreen('support-conscious', () => {
     goTo('resolve');
   });
 
-  content.append(timerStrip, vitalsCard, checklistCard, callBtn, resolveBtn);
+  // ── Team strip ────────────────────────────
+  const coordStrip = el('div', 'onsite-coord-strip');
+  coordStrip.addEventListener('click', showCoordinationSheet);
+
+  content.append(coordStrip, timerStrip, vitalsCard, checklistCard, callBtn, resolveBtn);
   screen.append(makeTopBar(), hero, content, makeBottomNav('help'));
 
   // ── Lifecycle ─────────────────────────────
@@ -139,6 +145,40 @@ registerScreen('support-conscious', () => {
     // Update hero name
     const heroTitle = document.getElementById('scHeroTitle');
     if (heroTitle) heroTitle.textContent = `${DATA.incident.victim.name} is conscious`;
+
+    // Refresh coordination strip
+    const v = DATA.incident;
+    const arrivedCount = v.responders.filter(r => r.status === 'arrived').length + 1;
+    const avatarColors = ['teal', 'grey'];
+    const label = v.responders.length === 0
+      ? 'Solo responder — tap for details'
+      : `${arrivedCount} on-site — tap for details`;
+    coordStrip.innerHTML = `
+      <div class="rnav-coord-avatars">
+        ${v.responders.map((r, i) => `<div class="rnav-avatar ${avatarColors[i] ?? 'grey'}">${r.initials}</div>`).join('')}
+        <div class="rnav-avatar" style="background:#4285F4${v.responders.length ? ';margin-left:-7px' : ''}">YOU</div>
+      </div>
+      <div class="onsite-coord-label">${label}</div>
+      <div class="onsite-coord-arrow">›</div>
+    `;
+
+    // Reset checklist, then pre-check items already done by on-site responder
+    doneCount = 0;
+    checkItemEls.forEach(item => {
+      item.classList.remove('done');
+      item.querySelector('svg').style.display = 'none';
+    });
+    resolveBtn.classList.remove('resolve-ready');
+
+    const preChecked = DATA.incident.checksCompleted || 0;
+    for (let i = 0; i < preChecked && i < checkItemEls.length; i++) {
+      checkItemEls[i].classList.add('done');
+      checkItemEls[i].querySelector('svg').style.display = 'block';
+      doneCount++;
+    }
+    const bar = document.getElementById('scProgress');
+    if (bar) bar.style.width = `${(doneCount / checks.length) * 100}%`;
+    if (doneCount >= checks.length) resolveBtn.classList.add('resolve-ready');
 
     startTs = Date.now();
 

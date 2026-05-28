@@ -53,11 +53,11 @@ registerScreen('support-unconscious', () => {
 
   // ── Checklist ─────────────────────────────
   const checks = [
-    { label: 'Cleared the airway',             sub: 'Head tilt, chin lift — checked for obstructions' },
-    { label: 'Placed in recovery position',    sub: 'On side; prevents airway obstruction if vomiting' },
-    { label: 'Applied cooling to body',        sub: 'Cool wet cloths on neck, armpits, and groin' },
-    { label: 'NOT given food or water',        sub: 'Unconscious patients must not be given anything orally' },
-    { label: 'Staying with patient',           sub: 'Not leaving until Emergency Services arrive' },
+    { icon: '🫁', label: 'Cleared the airway',             sub: 'Head tilt, chin lift — checked for obstructions' },
+    { icon: '↩️', label: 'Placed in recovery position',    sub: 'On side; prevents airway obstruction if vomiting' },
+    { icon: '🧊', label: 'Applied cooling to body',        sub: 'Cool wet cloths on neck, armpits, and groin' },
+    { icon: '🚫', label: 'NOT given food or water',        sub: 'Unconscious patients must not be given anything orally' },
+    { icon: '🧍', label: 'Staying with patient',           sub: 'Not leaving until Emergency Services arrive' },
   ];
 
   const checklistCard = el('div', 'support-checklist-card');
@@ -79,6 +79,7 @@ registerScreen('support-unconscious', () => {
             stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
+      <div class="support-check-icon">${c.icon}</div>
       <div class="support-check-text">
         <div class="support-check-label">${c.label}</div>
         <div class="support-check-sub">${c.sub}</div>
@@ -112,7 +113,11 @@ registerScreen('support-unconscious', () => {
     goTo('resolve');
   });
 
-  content.append(callBtn, timerStrip, checklistCard, resolveBtn);
+  // ── Team strip ────────────────────────────
+  const coordStrip = el('div', 'onsite-coord-strip');
+  coordStrip.addEventListener('click', showCoordinationSheet);
+
+  content.append(callBtn, coordStrip, timerStrip, checklistCard, resolveBtn);
   screen.append(makeTopBar(), hero, content, makeBottomNav('help'));
 
   // ── Lifecycle ─────────────────────────────
@@ -122,6 +127,22 @@ registerScreen('support-unconscious', () => {
   screen._onActivate = () => {
     const heroTitle = document.getElementById('suHeroTitle');
     if (heroTitle) heroTitle.textContent = `${DATA.incident.victim.name} is UNCONSCIOUS`;
+
+    // Refresh coordination strip
+    const v = DATA.incident;
+    const arrivedCount = v.responders.filter(r => r.status === 'arrived').length + 1;
+    const avatarColors = ['teal', 'grey'];
+    const label = v.responders.length === 0
+      ? 'Solo responder — tap for details'
+      : `${arrivedCount} on-site — tap for details`;
+    coordStrip.innerHTML = `
+      <div class="rnav-coord-avatars">
+        ${v.responders.map((r, i) => `<div class="rnav-avatar ${avatarColors[i] ?? 'grey'}">${r.initials}</div>`).join('')}
+        <div class="rnav-avatar" style="background:#4285F4${v.responders.length ? ';margin-left:-7px' : ''}">YOU</div>
+      </div>
+      <div class="onsite-coord-label">${label}</div>
+      <div class="onsite-coord-arrow">›</div>
+    `;
 
     startTs = Date.now();
     clearInterval(timerInterval);

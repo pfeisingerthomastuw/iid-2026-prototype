@@ -15,7 +15,7 @@
 
     html, body {
       width: 100%; height: 100%; overflow: hidden;
-      background: #1a1a1a;
+      background: #D8D8D8;
       display: flex; align-items: center; justify-content: center;
       font-family: 'Barlow', sans-serif;
     }
@@ -142,13 +142,14 @@
     .btn-cancel {
       background: none; border: none;
       font-family: 'Barlow', sans-serif;
-      font-size: 13px; font-weight: 700; letter-spacing: 2px;
-      color: rgba(255,255,255,0.75); cursor: pointer;
+      font-size: 11px; font-weight: 500; letter-spacing: .5px;
+      color: rgba(255,255,255,0.35); cursor: pointer;
       text-decoration: underline; text-underline-offset: 3px;
-      padding: 8px;
+      text-decoration-color: rgba(255,255,255,0.2);
+      padding: 8px; margin-top: 4px;
     }
 
-    /* ── Bottom nav (matches prototype.html) ── */
+    /* ── Bottom nav (matches homescreen.html) ── */
     .bottom-nav {
       flex-shrink: 0; height: 68px;
       background: rgba(0,0,0,0.22);
@@ -229,10 +230,11 @@
         <div class="count-label">SECONDS</div>
       </div>
     </div>
+    <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.55);letter-spacing:.4px;text-align:center;margin-top:-14px;margin-bottom:20px;">Until emergency is triggered automatically</div>
 
     <!-- Buttons -->
     <div class="actions">
-      <button class="btn-emergency" id="emergBtn">EMERGENCY HELP</button>
+      <button class="btn-emergency" id="emergBtn">CALL EMERGENCY HELP NOW</button>
       <button class="btn-cancel"    id="cancelBtn">CANCEL</button>
     </div>
 
@@ -325,12 +327,12 @@
   document.getElementById('emergBtn').addEventListener('click', triggerEmergency);
   document.getElementById('cancelBtn').addEventListener('click', () => {
     clearTimeout(timer);
-    window.location.href = 'prototype.html';
+    window.location.href = 'homescreen.html';
   });
 
   // Tapping the sent overlay dismisses it → land on reported screen
   overlay.addEventListener('click', () => {
-    window.location.href = 'prototype.html?start=reported';
+    window.location.href = 'homescreen.html?start=reported';
   });
 </script>
 </body>
