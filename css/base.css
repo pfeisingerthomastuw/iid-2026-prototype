@@ -33,10 +33,16 @@ html, body {
   display: flex; align-items: center; justify-content: center;
   font-family: 'Barlow', sans-serif;
 }
+body { height: 100vh; height: 100dvh; }
 
-/* ── Phone shell ── */
+/* ── Phone shell ──
+   On desktop this renders as a 390×844 phone mockup. On smaller screens it
+   shrinks to fit the viewport so it never overflows. dvh tracks the *visible*
+   viewport, so the mobile browser URL bar can't push the frame off-screen. */
 #app {
-  width: 390px; height: 844px;
+  width: min(390px, 100vw);
+  height: min(844px, 100vh);
+  height: min(844px, 100dvh);
   background: var(--bg);
   position: relative; overflow: hidden;
   border-radius: 44px;
@@ -44,6 +50,17 @@ html, body {
     0 0 0 1px rgba(0,0,0,0.18),
     0 40px 100px rgba(0,0,0,0.45),
     0 8px 30px rgba(0,0,0,0.2);
+}
+
+/* On phones (and narrow windows) fill the device edge-to-edge and drop the
+   desktop mockup chrome — no rounded corners, no drop shadow, no grey margin. */
+@media (max-width: 430px) {
+  html, body { background: var(--bg); }
+  #app {
+    width: 100vw;
+    border-radius: 0;
+    box-shadow: none;
+  }
 }
 
 /* ── Screen transitions ── */

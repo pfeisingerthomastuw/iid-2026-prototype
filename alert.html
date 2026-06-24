@@ -19,10 +19,13 @@
       display: flex; align-items: center; justify-content: center;
       font-family: 'Barlow', sans-serif;
     }
+    body { height: 100vh; height: 100dvh; }
 
     /* ── Phone shell ── */
     #app {
-      width: 390px; height: 844px;
+      width: min(390px, 100vw);
+      height: min(844px, 100vh);
+      height: min(844px, 100dvh);
       background: linear-gradient(160deg, #C62828 0%, #6B0000 100%);
       position: relative; overflow: hidden;
       border-radius: 44px;
@@ -31,6 +34,16 @@
         0 40px 100px rgba(0,0,0,0.6);
       display: flex; flex-direction: column;
       animation: urgent-breathe 3s ease-in-out infinite;
+    }
+
+    /* On phones: fill the device, drop the desktop mockup chrome */
+    @media (max-width: 430px) {
+      html, body { background: #6B0000; }
+      #app {
+        width: 100vw;
+        border-radius: 0;
+        box-shadow: none;
+      }
     }
     @keyframes urgent-breathe {
       0%,100% { filter: brightness(1);    }
